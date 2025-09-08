@@ -29,7 +29,7 @@ function Shop() {
         },
     )
 
-    const handleClick = (id) => {
+    const handleClick = (id: string) => {
         sendJsonMessage({event: "monsterBought", data: {id: id}})
 
     }
