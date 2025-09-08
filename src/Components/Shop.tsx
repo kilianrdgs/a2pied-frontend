@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import './Shop.css';
 
 import logo from '../../public/logo.png'; 
@@ -15,6 +16,19 @@ const shopItems = [
 ];
 
 function Shop() {
+  const [username, setUsername] = useState('MAITRE AXEL');
+  const [email, setEmail] = useState('test@gmail.com');
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, []);
   return (
     <div className="shop-container">
       <header className="shop-header">
@@ -27,8 +41,8 @@ function Shop() {
           <div className="user-details">
             <img src={avatar} alt="Maitre Axel" className="user-avatar" />
             <div>
-              <p className="user-name">MAITRE AXEL</p>
-              <p className="user-email">test@gmail.com</p>
+              <p className="user-name">{username.toUpperCase()}</p>
+              <p className="user-email">{email}</p>
             </div>
           </div>
           <div className="user-credits">
