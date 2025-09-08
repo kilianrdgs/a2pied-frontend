@@ -8,11 +8,12 @@ export default function LogEmail() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Email:", email);
+    localStorage.setItem("email", email);
     navigate('/FootFactorLogin');
   };
 
   return (
-    <div className="flex flex-col items-center justify-center ">
+    <div className=" flex flex-col items-center justify-center">
       <motion.img
         src="/logo.png"
         alt="Foot Factor Logo"

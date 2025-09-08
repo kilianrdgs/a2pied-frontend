@@ -4,11 +4,12 @@ import { useNavigate } from "react-router";
 
 export default function FootFactorLogin() {
   const [pseudo, setPseudo] = useState("");
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Pseudo:", pseudo);
-    navigate('/shop');
+    localStorage.setItem("username", pseudo);
+    navigate("/shop");
   };
 
   return (
@@ -24,32 +25,32 @@ export default function FootFactorLogin() {
       />
 
       <div className="flex flex-col gap-4 items-center justify-center">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-black border border-red-600 rounded-lg mt-6 p-6 flex flex-col items-center gap-4 shadow-lg shadow-red-900/40"
-      >
-        <label
-          htmlFor="pseudo"
-          className="text-red-600 font-bold tracking-widest"
+        <form
+          onSubmit={handleSubmit}
+          className="bg-black border border-red-600 rounded-lg mt-6 p-6 flex flex-col items-center gap-4 shadow-lg shadow-red-900/40"
         >
-          PSEUDO
-        </label>
-        <input
-          id="pseudo"
-          type="text"
-          value={pseudo}
-          onChange={(e) => setPseudo(e.target.value)}
-          className="w-56 px-3 py-2 bg-black text-red-600 border border-red-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-          placeholder="Entrez votre pseudo"
-          required
-        />
-            <button
-          type="submit"
-          className="bg-red-700 text-black font-bold px-6 py-2 rounded hover:bg-red-800 transition"
-        >
-          COMMENCER
-        </button>
-      </form>
+          <label
+            htmlFor="pseudo"
+            className="text-red-600 font-bold tracking-widest"
+          >
+            PSEUDO
+          </label>
+          <input
+            id="pseudo"
+            type="text"
+            value={pseudo}
+            onChange={(e) => setPseudo(e.target.value)}
+            className="w-56 px-3 py-2 bg-black text-red-600 border border-red-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+            placeholder="Entrez votre pseudo"
+            required
+          />
+          <button
+            type="submit"
+            className="bg-red-700 text-black font-bold px-6 py-2 rounded hover:bg-red-800 transition"
+          >
+            COMMENCER
+          </button>
+        </form>
       </div>
     </div>
   );

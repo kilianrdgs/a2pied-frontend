@@ -10,6 +10,7 @@
 
 .shop-container {
   color: var(--primary-red);
+  background-color: #040404;
   min-height: 100vh;
   padding: 20px;
   font-family: 'Roboto', sans-serif; 
