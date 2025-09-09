@@ -7,9 +7,8 @@ import boiteAffamee from '../../public/logo.png';
 import boitePiegee from '../../public/logo.png';
 import boiteVolante from '../../public/logo.png';
 import boiteColossale from '../../public/logo.png';
-import {WebSocketHandler} from "./WebSocketHandler.tsx";
-import useWebSocket from "react-use-websocket";
-import {getWebSocketURL} from "../utils/getWebSocketURL.ts";
+import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "../utils/WebsocketCommunicationC2SType.ts";
+import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
 
 const shopItems = [
     {name: 'BOITE AFFAMÉE', cost: 10, image: boiteAffamee, _id: "1"},
@@ -21,19 +20,15 @@ const shopItems = [
 function Shop() {
     const [username, setUsername] = useState('MAITRE AXEL');
     const [email, setEmail] = useState('test@gmail.com');
-    const {sendJsonMessage} = useWebSocket(
-        getWebSocketURL(),
-        {
-            share: true,
-            shouldReconnect: () => true,
-        },
-    )
+    const {isOpen, sendJsonMessage} = useAppWebSocket({autoSyn: true});
 
     const handleClick = (id: string) => {
-        sendJsonMessage({event: "monsterBought", data: {id: id}})
-
-    }
-
+        const msg: WebsocketCommunicationC2SType = {
+            event: WebsocketEventC2SEnum.MONSTER_BOUGHT,
+            data: {id},
+        };
+        sendJsonMessage(msg);
+    };
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
@@ -47,7 +42,6 @@ function Shop() {
     }, []);
     return (
         <div className="shop-container">
-            <WebSocketHandler/>
             <header className="shop-header">
                 <img src={logo} alt="Foot Factor Logo" className="shop-logo"/>
                 <h1>FOOT FACTOR</h1>
@@ -73,7 +67,9 @@ function Shop() {
                             <img src={item.image} alt={item.name} className="item-image"/>
                             <p className="item-name">{item.name}</p>
                             <p className="item-cost">coût: {item.cost}</p>
-                            <button className="invoke-button" onClick={() => handleClick(item._id)}>invoquer</button>
+                            <button disabled={!isOpen} className="invoke-button"
+                                    onClick={() => handleClick(item._id)}>invoquer
+                            </button>
                         </div>
                     ))}
                 </div>
