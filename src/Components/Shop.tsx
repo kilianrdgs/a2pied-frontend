@@ -1,15 +1,17 @@
 import {useEffect, useState} from 'react';
+import { createUser } from '../services/api';
+import type { UserData } from '../services/api';
 import './Shop.css';
 
-import logo from '../../public/logo.png';
-import avatar from '../../public/logo.png';
-import boiteAffamee from '../../public/logo.png';
-import boitePiegee from '../../public/logo.png';
-import boiteVolante from '../../public/logo.png';
-import boiteColossale from '../../public/logo.png';
-import {WebSocketHandler} from "./WebSocketHandler.tsx";
-import useWebSocket from "react-use-websocket";
-import {getWebSocketURL} from "../utils/getWebSocketURL.ts";
+import logo from '../../src/assets/logo.png';
+import avatar from '../../src/assets/logo.png';
+import boiteAffamee from '../../src/assets/logo.png';
+import boitePiegee from '../../src/assets/logo.png';
+import boiteVolante from '../../src/assets/logo.png';
+import boiteColossale from '../../src/assets/logo.png';
+// import {WebSocketHandler} from "./WebSocketHandler.tsx";
+// import useWebSocket from "react-use-websocket";
+// import {getWebSocketURL} from "../utils/getWebSocketURL.ts";
 
 const shopItems = [
     {name: 'BOITE AFFAMÉE', cost: 10, image: boiteAffamee, _id: "1"},
@@ -21,33 +23,65 @@ const shopItems = [
 function Shop() {
     const [username, setUsername] = useState('MAITRE AXEL');
     const [email, setEmail] = useState('test@gmail.com');
-    const {sendJsonMessage} = useWebSocket(
-        getWebSocketURL(),
-        {
-            share: true,
-            shouldReconnect: () => true,
-        },
-    )
+    const [isLoading, setIsLoading] = useState(false);
+    const [isUserSaved, setIsUserSaved] = useState(false);
+    // const {sendJsonMessage} = useWebSocket(
+    //     getWebSocketURL(),
+    //     {
+    //         share: true,
+    //         shouldReconnect: () => true,
+    //     },
+    // )
 
     const handleClick = (id: string) => {
-        sendJsonMessage({event: "monsterBought", data: {id: id}})
-
+        // sendJsonMessage({event: "monsterBought", data: {id: id}})
+        console.log('Item clicked:', id); // Alternative pour le debug
     }
 
 
+    // Load data from localStorage
     useEffect(() => {
-        const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            setUsername(storedUsername);
-        }
-        const storedEmail = localStorage.getItem('email');
-        if (storedEmail) {
-            setEmail(storedEmail);
-        }
+      const storedUsername = localStorage.getItem('username');
+      const storedEmail = localStorage.getItem('email');
+      
+      if (storedUsername) {
+        setUsername(storedUsername);
+      }
+      if (storedEmail) {
+        setEmail(storedEmail);
+      }
     }, []);
+      // Save to database when values change
+      useEffect(() => {
+        if (username !== 'MAITRE AXEL' && email !== 'test@gmail.com') {
+          saveUserToDatabase();
+      }
+    }, [username, email]);
+
+    const saveUserToDatabase = async () => {
+    // Don't save if already saved or using default values
+    if (isUserSaved || (username === 'MAITRE AXEL' && email === 'test@gmail.com')) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const userData: UserData = {
+        mail: email,
+        pseudo: username
+      };
+      
+      await createUser(userData);
+      setIsUserSaved(true);
+    } catch (error) {
+      console.error('Error saving user to DB:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
     return (
         <div className="shop-container">
-            <WebSocketHandler/>
+            {/* <WebSocketHandler/> */}
             <header className="shop-header">
                 <img src={logo} alt="Foot Factor Logo" className="shop-logo"/>
                 <h1>FOOT FACTOR</h1>

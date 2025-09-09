@@ -15,7 +15,7 @@ export default function FootFactorLogin() {
   return (
     <div className="flex flex-col items-center justify-center ">
       <motion.img
-        src="/logo.png"
+        src="/src/assets/logo.png"
         alt="Foot Factor Logo"
         style={{ width: "140px", height: "auto" }}
         className=" mb-2"
