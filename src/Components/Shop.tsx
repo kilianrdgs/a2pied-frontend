@@ -48,7 +48,10 @@ const shopItems = [
 function Shop() {
     const [username, setUsername] = useState('MAITRE AXEL');
     const [email, setEmail] = useState('test@gmail.com');
-    const [isLoading, setIsLoading] = useState(false);
+    //todo : fix l'utilisation de  'is loading'
+    /*
+        const [isLoading,setIsLoading] = useState(false);
+    */
     const [isUserSaved, setIsUserSaved] = useState(false);
     const {isOpen, sendJsonMessage, lastJsonMessage} = useAppWebSocket({autoSyn: true, email});
     const {addToast} = useToast()
@@ -104,7 +107,9 @@ function Shop() {
             return;
         }
 
-        setIsLoading(true);
+        /*
+                setIsLoading(true);
+        */
         try {
             const userData: UserData = {
                 mail: email,
@@ -116,7 +121,9 @@ function Shop() {
         } catch (error) {
             console.error('Error saving user to DB:', error);
         } finally {
-            setIsLoading(false);
+            /*
+                        setIsLoading(false);
+            */
         }
     };
     return (
