@@ -1,4 +1,6 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
+import { createUser } from '../services/api';
+import type { UserData } from '../services/api';
 import './Shop.css';
 
 import logo from '../../public/logo.png';
@@ -7,50 +9,84 @@ import boiteAffamee from '../../public/logo.png';
 import boitePiegee from '../../public/logo.png';
 import boiteVolante from '../../public/logo.png';
 import boiteColossale from '../../public/logo.png';
-import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "../utils/WebsocketCommunicationC2SType.ts";
-import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
+import { type WebsocketCommunicationC2SType, WebsocketEventC2SEnum } from "../utils/WebsocketCommunicationC2SType.ts";
+import { useAppWebSocket } from "../utils/useAppWebSocket.ts";
 
 const shopItems = [
-    {name: 'BOITE AFFAMÉE', cost: 10, image: boiteAffamee, _id: "1"},
-    {name: 'BOITE PIÉGÉE', cost: 30, image: boitePiegee, _id: "2"},
-    {name: 'BOITE VOLANTE', cost: 50, image: boiteVolante, _id: "3"},
-    {name: 'BOITE COLOSSALE', cost: 200, image: boiteColossale, _id: "4"},
+    { name: 'BOITE AFFAMÉE', cost: 10, image: boiteAffamee, _id: "1" },
+    { name: 'BOITE PIÉGÉE', cost: 30, image: boitePiegee, _id: "2" },
+    { name: 'BOITE VOLANTE', cost: 50, image: boiteVolante, _id: "3" },
+    { name: 'BOITE COLOSSALE', cost: 200, image: boiteColossale, _id: "4" },
 ];
 
 function Shop() {
     const [username, setUsername] = useState('MAITRE AXEL');
     const [email, setEmail] = useState('test@gmail.com');
-    const {isOpen, sendJsonMessage} = useAppWebSocket({autoSyn: true});
+    const [isLoading, setIsLoading] = useState(false);
+    const [isUserSaved, setIsUserSaved] = useState(false);
+    const { isOpen, sendJsonMessage } = useAppWebSocket({ autoSyn: true });
 
     const handleClick = (id: string) => {
         const msg: WebsocketCommunicationC2SType = {
             event: WebsocketEventC2SEnum.MONSTER_BOUGHT,
-            data: {id},
+            data: { id },
         };
         sendJsonMessage(msg);
     };
 
+    // Load data from localStorage
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
+        const storedEmail = localStorage.getItem('email');
+        
         if (storedUsername) {
             setUsername(storedUsername);
         }
-        const storedEmail = localStorage.getItem('email');
         if (storedEmail) {
             setEmail(storedEmail);
         }
     }, []);
+
+    // Save to database when values change
+    useEffect(() => {
+        if (username !== 'MAITRE AXEL' && email !== 'test@gmail.com') {
+            saveUserToDatabase();
+        }
+    }, [username, email]);
+
+    const saveUserToDatabase = async () => {
+        // Don't save if already saved or using default values
+        if (isUserSaved || (username === 'MAITRE AXEL' && email === 'test@gmail.com')) {
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const userData: UserData = {
+                mail: email,
+                pseudo: username
+            };
+            
+            await createUser(userData);
+            setIsUserSaved(true);
+        } catch (error) {
+            console.error('Error saving user to DB:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="shop-container">
             <header className="shop-header">
-                <img src={logo} alt="Foot Factor Logo" className="shop-logo"/>
+                <img src={logo} alt="Foot Factor Logo" className="shop-logo" />
                 <h1>FOOT FACTOR</h1>
             </header>
 
             <main className="shop-main">
                 <div className="user-info-bar">
                     <div className="user-details">
-                        <img src={avatar} alt="Maitre Axel" className="user-avatar"/>
+                        <img src={avatar} alt="Maitre Axel" className="user-avatar" />
                         <div>
                             <p className="user-name">{username.toUpperCase()}</p>
                             <p className="user-email">{email}</p>
@@ -64,11 +100,15 @@ function Shop() {
                 <div className="shop-grid">
                     {shopItems.map((item) => (
                         <div key={item.name} className="shop-item-card">
-                            <img src={item.image} alt={item.name} className="item-image"/>
+                            <img src={item.image} alt={item.name} className="item-image" />
                             <p className="item-name">{item.name}</p>
                             <p className="item-cost">coût: {item.cost}</p>
-                            <button disabled={!isOpen} className="invoke-button"
-                                    onClick={() => handleClick(item._id)}>invoquer
+                            <button 
+                                disabled={!isOpen} 
+                                className="invoke-button"
+                                onClick={() => handleClick(item._id)}
+                            >
+                                invoquer
                             </button>
                         </div>
                     ))}
