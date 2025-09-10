@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react';
-import type {UserData} from '../services/api';
-import {createUser} from '../services/api';
+import { useEffect, useState } from 'react';
+import { createUser } from '../services/api';
+import type { UserData } from '../services/api';
 import './Shop.css';
 
 import logo from '../../public/logo.png';
@@ -9,129 +9,227 @@ import boiteAffamee from '../../public/logo.png';
 import boitePiegee from '../../public/logo.png';
 import boiteVolante from '../../public/logo.png';
 import boiteColossale from '../../public/logo.png';
-import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
-import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "../utils/WebsocketCommunicationC2SType.ts";
+import { type WebsocketCommunicationC2SType, WebsocketEventC2SEnum } from "../utils/WebsocketCommunicationC2SType.ts";
+import { useAppWebSocket } from "../utils/useAppWebSocket.ts";
+import { useNavigate } from 'react-router-dom';
 
-const shopItems = [
-    {
-        name: "Gobelin",
-        cost: "10",
-        life: "20",
-        image: boiteAffamee,
-        damage: 3,
-    },
-    {
-        name: "Orc",
-        cost: "25",
-        life: "40",
-        image: boitePiegee,
-        damage: 7,
-    },
-    {
-        name: "Troll",
-        cost: "50",
-        life: "80",
-        image: boiteVolante,
-        damage: 12,
-    },
-    {
-        name: "Dragon",
-        cost: "200",
-        life: "300",
-        image: boiteColossale,
-        damage: 30,
-    },
-];
+// Un seul type pour les mobs
+interface MobType {
+    _id: string;
+    cost: string;
+    name: string;
+    life: string;
+    damage: number;
+}
 
 function Shop() {
     const [username, setUsername] = useState('MAITRE AXEL');
-    const [email, setEmail] = useState('test@gmail.com');
-    const [isLoading, setIsLoading] = useState(false);
+    const [email, setEmail] = useState('test@gamil.com');
     const [isUserSaved, setIsUserSaved] = useState(false);
+    const [credits, setCredits] = useState(125);
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
+    const [popupType, setPopupType] = useState<'success' | 'error'>('success');
+    const [animateCredits, setAnimateCredits] = useState(false);
     const {isOpen, sendJsonMessage} = useAppWebSocket({autoSyn: true, email});
+    const [mobs, setMobs] = useState<MobType[]>([]);
+    const navigate = useNavigate();
 
-    const handleClick = (name: string) => {
+    // Fonction pour récupérer l'image basée sur le nom
+    const getMobImage = (name: string): string => {
+        const n = name.toLowerCase();
+        if (n.includes('affamee')) return boiteAffamee;
+        if (n.includes('piegee')) return boitePiegee;
+        if (n.includes('volante')) return boiteVolante;
+        if (n.includes('colossale')) return boiteColossale;
+        return boiteAffamee;
+    };
+
+    // Fonction pour afficher une popup
+    const showPopupMessage = (message: string, type: 'success' | 'error') => {
+        setPopupMessage(message);
+        setPopupType(type);
+        setShowPopup(true);
+        setTimeout(() => setShowPopup(false), 3000);
+    };
+
+    // Animation des crédits
+    const animateCreditsDecrease = () => {
+        setAnimateCredits(true);
+        setTimeout(() => setAnimateCredits(false), 600);
+    };
+
+    // Fonction de déconnexion
+    const handleLogout = () => {
+        // Supprimer les données du localStorage
+        localStorage.removeItem('email');
+        localStorage.removeItem('username');
+        localStorage.removeItem('exist');
+        localStorage.removeItem('credits');
+        
+        // Afficher un message de déconnexion
+        showPopupMessage('Déconnexion réussie !', 'success');
+        
+        // Rediriger vers la page de connexion après un délai
+        setTimeout(() => {
+            navigate('/');
+        }, 500);
+    };
+
+    const handleClick = (id: string, mobName: string, mobCost: string) => {
+        const cost = parseInt(mobCost);
+        
+        // Vérifier si assez de crédits
+        if (credits < cost) {
+            showPopupMessage(`Pas assez de crédits ! Il vous faut ${cost} crédits pour invoquer ${mobName}.`, 'error');
+            return;
+        }
+
+        // Déduire les crédits
+        const newCredits = credits - cost;
+        setCredits(newCredits);
+        localStorage.setItem('credits', newCredits.toString());
+        
+        // Animation et popup de succès
+        animateCreditsDecrease();
+        showPopupMessage(`${mobName} invoqué avec succès ! -${cost} crédits`, 'success');
+
+        // Envoyer le message websocket
         const msg: WebsocketCommunicationC2SType = {
             event: WebsocketEventC2SEnum.MONSTER_BOUGHT,
-            data: {monsterName: name, userEmail: email},
+            data: { id },
         };
         sendJsonMessage(msg);
     };
 
-    // Load data from localStorage
+    // Récupérer les mobs depuis l'API
     useEffect(() => {
+        const fetchMobs = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/api/mobtypes');
+                const data: MobType[] = await response.json();
+                setMobs(data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des mobs:', error);
+                // Fallback avec des données par défaut
+                setMobs([
+                    { _id: "1", name: 'BOITE AFFAMÉE', cost: '10', life: '50', damage: 10 },
+                    { _id: "2", name: 'BOITE PIÉGÉE', cost: '30', life: '50', damage: 10 },
+                    { _id: "3", name: 'BOITE VOLANTE', cost: '50', life: '50', damage: 10 },
+                    { _id: "4", name: 'BOITE COLOSSALE', cost: '200', life: '50', damage: 10 }
+                ]);
+            }
+        };
+
+        fetchMobs();
+
+        // Load localStorage data
         const storedUsername = localStorage.getItem('username');
         const storedEmail = localStorage.getItem('email');
-
-        if (storedUsername) {
-            setUsername(storedUsername);
-        }
-        if (storedEmail) {
-            setEmail(storedEmail);
+        const storedCredits = localStorage.getItem('credits');
+        
+        if (storedUsername) setUsername(storedUsername);
+        if (storedEmail) setEmail(storedEmail);
+        // Si pas de crédits stockés, on utilise la valeur par défaut (125)
+        if (storedCredits) {
+            setCredits(parseInt(storedCredits));
+        } else {
+            // Sauvegarder les crédits par défaut dans localStorage
+            localStorage.setItem('credits', '125');
         }
     }, []);
+
     // Save to database when values change
-    useEffect(() => {
+    useEffect(() => {        
         if (username !== 'MAITRE AXEL' && email !== 'test@gmail.com') {
-            saveUserToDatabase();
+            if (localStorage.getItem('exist') === 'false') {
+                saveUserToDatabase();
+                localStorage.setItem('exist', 'true');
+            }
         }
     }, [username, email]);
 
     const saveUserToDatabase = async () => {
-        // Don't save if already saved or using default values
         if (isUserSaved || (username === 'MAITRE AXEL' && email === 'test@gmail.com')) {
             return;
         }
-
-        setIsLoading(true);
         try {
             const userData: UserData = {
                 mail: email,
                 pseudo: username
             };
-
+            
             await createUser(userData);
             setIsUserSaved(true);
         } catch (error) {
             console.error('Error saving user to DB:', error);
-        } finally {
-            setIsLoading(false);
         }
     };
+
     return (
         <div className="shop-container">
+            {/* Popup */}
+            {showPopup && (
+                <div className={`popup ${popupType}`}>
+                    <div className="popup-content">
+                        <p>{popupMessage}</p>
+                    </div>
+                </div>
+            )}
+
             <header className="shop-header">
-                <img src={logo} alt="Foot Factor Logo" className="shop-logo"/>
+                <img src={logo} alt="Foot Factor Logo" className="shop-logo" />
                 <h1>FOOT FACTOR</h1>
+                {/* Bouton de déconnexion - Desktop */}
+                <button 
+                    className="logout-button logout-button-desktop"
+                    onClick={handleLogout}
+                >
+                    Se déconnecter
+                </button>
             </header>
 
             <main className="shop-main">
                 <div className="user-info-bar">
                     <div className="user-details">
-                        <img src={avatar} alt="Maitre Axel" className="user-avatar"/>
+                        <img src={avatar} alt="Maitre Axel" className="user-avatar" />
                         <div>
                             <p className="user-name">{username.toUpperCase()}</p>
                             <p className="user-email">{email}</p>
                         </div>
                     </div>
-                    <div className="user-credits">
-                        125 CRÉDITS
+                    <div className={`user-credits ${animateCredits ? 'credits-animate' : ''}`}>
+                        {credits} CRÉDITS
                     </div>
                 </div>
 
                 <div className="shop-grid">
-                    {shopItems.map((item) => (
-                        <div key={item.name} className="shop-item-card">
-                            <img src={item.image} alt={item.name} className="item-image"/>
-                            <p className="item-name">{item.name}</p>
-                            <p className="item-cost">coût: {item.cost}</p>
-                            <button disabled={!isOpen} className="invoke-button"
-                                    onClick={() => handleClick(item.name)}>invoquer
+                    {mobs.map((mob) => (
+                        <div key={mob._id} className="shop-item-card">
+                            <img src={getMobImage(mob.name)} alt={mob.name} className="item-image" />
+                            <p className="item-name">{mob.name.toUpperCase()}</p>
+                            <p className="item-cost">coût: {mob.cost}</p>
+                            <button 
+                                disabled={!isOpen || credits < parseInt(mob.cost)} 
+                                className={`invoke-button ${credits < parseInt(mob.cost) ? 'insufficient-credits' : ''}`}
+                                onClick={() => handleClick(mob._id, mob.name, mob.cost)}
+                            >
+                                {credits < parseInt(mob.cost) ? 'Pas assez de crédits' : 'Invoquer'}
                             </button>
                         </div>
                     ))}
                 </div>
             </main>
+
+            {/* Bouton de déconnexion - Mobile */}
+            <div className="mobile-logout-container">
+                <button 
+                    className="logout-button logout-button-mobile"
+                    onClick={handleLogout}
+                >
+                    Se déconnecter
+                </button>
+            </div>
         </div>
     );
 }

@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 
 export default function FootFactorLogin() {
   const [pseudo, setPseudo] = useState("");
   const navigate = useNavigate();
+
+  // Vérification du localStorage au chargement du composant
+    useEffect(() => {
+      const storedEmail = localStorage.getItem("username");
+      if (storedEmail) {
+        navigate('/shop');
+      }
+    }, [navigate]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Pseudo:", pseudo);
