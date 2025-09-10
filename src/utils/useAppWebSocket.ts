@@ -3,16 +3,23 @@ import {useEffect, useMemo} from 'react';
 import useWebSocket, {ReadyState} from 'react-use-websocket';
 import {getWebSocketURL} from "./getWebSocketURL.ts";
 import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "./WebsocketCommunicationC2SType.ts";
+import type {WebsocketCommunicationS2CType} from "./WebsocketCommunicationS2CType.ts";
 
 type UseAppWebSocketOptions = {
     autoSyn?: boolean;
     email: string
 };
 
+
 export function useAppWebSocket(options: UseAppWebSocketOptions) {
     const url: string = getWebSocketURL();
 
-    const {lastJsonMessage, readyState, sendJsonMessage, sendMessage} = useWebSocket(`${url}?token=${options.email}`, {
+    const {
+        lastJsonMessage,
+        readyState,
+        sendJsonMessage,
+        sendMessage
+    } = useWebSocket<WebsocketCommunicationS2CType>(`${url}?token=${options.email}`, {
         share: true,
         shouldReconnect: () => true,
     });

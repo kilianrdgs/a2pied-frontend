@@ -11,31 +11,33 @@ import boiteVolante from '../../public/logo.png';
 import boiteColossale from '../../public/logo.png';
 import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
 import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "../utils/WebsocketCommunicationC2SType.ts";
+import {useToast} from "./ToastManager.tsx";
+import {type IMobType, WebsocketEventS2CEnum} from "../utils/WebsocketCommunicationS2CType.ts";
 
 const shopItems = [
     {
-        name: "Gobelin",
+        name: "dog",
         cost: "10",
         life: "20",
         image: boiteAffamee,
         damage: 3,
     },
     {
-        name: "Orc",
+        name: "snail",
         cost: "25",
         life: "40",
         image: boitePiegee,
         damage: 7,
     },
     {
-        name: "Troll",
+        name: "spider",
         cost: "50",
         life: "80",
         image: boiteVolante,
         damage: 12,
     },
     {
-        name: "Dragon",
+        name: "fish",
         cost: "200",
         life: "300",
         image: boiteColossale,
@@ -48,9 +50,28 @@ function Shop() {
     const [email, setEmail] = useState('test@gmail.com');
     const [isLoading, setIsLoading] = useState(false);
     const [isUserSaved, setIsUserSaved] = useState(false);
-    const {isOpen, sendJsonMessage} = useAppWebSocket({autoSyn: true, email});
+    const {isOpen, sendJsonMessage, lastJsonMessage} = useAppWebSocket({autoSyn: true, email});
+    const {addToast} = useToast()
+
+    useEffect(() => {
+        console.log('Receive a JSON :')
+        console.log(lastJsonMessage?.event);
+        if (lastJsonMessage?.event === WebsocketEventS2CEnum.MONSTER_KILL) {
+            const mobType = lastJsonMessage?.data?.mobType as IMobType
+            addToast({
+                sender: email,
+                subject: "Aïe aïe aïe",
+                preview: `Ton ${mobType.name} est mort !`,
+            })
+        }
+    }, [lastJsonMessage])
 
     const handleClick = (name: string) => {
+        addToast({
+            sender: email,
+            subject: "Aïe aïe aïe",
+            preview: `Ton 'TEST' est mort !`,
+        })
         const msg: WebsocketCommunicationC2SType = {
             event: WebsocketEventC2SEnum.MONSTER_BOUGHT,
             data: {monsterName: name, userEmail: email},
