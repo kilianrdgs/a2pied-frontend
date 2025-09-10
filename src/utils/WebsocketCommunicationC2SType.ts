@@ -1,8 +1,7 @@
 export enum WebsocketEventC2SEnum {
     MONSTER_BOUGHT = "MONSTER_BOUGHT",
-    MONSTER_LIST = "MONSTER_LIST",
     MONSTER_KILL = "MONSTER_KILL",
-    SYN = "SYN"
+    HELLO = "HELLO"
 }
 
 

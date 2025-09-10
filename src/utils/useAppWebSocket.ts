@@ -6,12 +6,13 @@ import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "./Webso
 
 type UseAppWebSocketOptions = {
     autoSyn?: boolean;
+    email: string
 };
 
-export function useAppWebSocket(options?: UseAppWebSocketOptions) {
+export function useAppWebSocket(options: UseAppWebSocketOptions) {
     const url: string = getWebSocketURL();
 
-    const {lastJsonMessage, readyState, sendJsonMessage, sendMessage} = useWebSocket(url, {
+    const {lastJsonMessage, readyState, sendJsonMessage, sendMessage} = useWebSocket(`${url}?token=${options.email}`, {
         share: true,
         shouldReconnect: () => true,
     });
@@ -19,8 +20,8 @@ export function useAppWebSocket(options?: UseAppWebSocketOptions) {
     useEffect(() => {
         if (readyState === ReadyState.OPEN && options?.autoSyn !== false) {
             const syn: WebsocketCommunicationC2SType = {
-                event: WebsocketEventC2SEnum.SYN,
-                data: {status: 'ok'},
+                event: WebsocketEventC2SEnum.HELLO,
+                data: {status: 'ok',},
             };
             sendJsonMessage(syn);
         }
