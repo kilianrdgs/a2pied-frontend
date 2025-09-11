@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import type {UserData} from '../services/api';
 import {createUser} from '../services/api';
-import './Shop.css';
+import './Shop-Mariem.css';
 
 import logo from '../../public/logo.png';
 import avatar from '../../public/logo.png';
@@ -12,6 +12,7 @@ import boiteColossale from '../../public/logo.png';
 import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "../utils/WebsocketCommunicationC2SType.ts";
 import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
 import {useNavigate} from 'react-router-dom';
+import {usePointsStore} from "../utils/pointsStore.ts";
 
 // Un seul type pour les mobs
 interface MobType {
@@ -22,11 +23,10 @@ interface MobType {
     damage: number;
 }
 
-function Shop() {
+function ShopMariem() {
     const [username, setUsername] = useState('MAITRE AXEL');
     const [email, setEmail] = useState('test@gamil.com');
     const [isUserSaved, setIsUserSaved] = useState(false);
-    const [credits, setCredits] = useState(125);
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
     const [popupType, setPopupType] = useState<'success' | 'error'>('success');
@@ -34,6 +34,9 @@ function Shop() {
     const {isOpen, sendJsonMessage} = useAppWebSocket({autoSyn: true, email});
     const [mobs, setMobs] = useState<MobType[]>([]);
     const navigate = useNavigate();
+    const points = usePointsStore((state) => state.points);
+    const setPoints = usePointsStore((state) => state.setPoints);
+
 
     // Fonction pour récupérer l'image basée sur le nom
     const getMobImage = (name: string): string => {
@@ -80,14 +83,14 @@ function Shop() {
         const cost = parseInt(mobCost);
 
         // Vérifier si assez de crédits
-        if (credits < cost) {
+        if (points < cost) {
             showPopupMessage(`Pas assez de crédits ! Il vous faut ${cost} crédits pour invoquer ${mobName}.`, 'error');
             return;
         }
 
         // Déduire les crédits
-        const newCredits = credits - cost;
-        setCredits(newCredits);
+        const newCredits = points - cost;
+        setPoints(newCredits);
         localStorage.setItem('credits', newCredits.toString());
 
         // Animation et popup de succès
@@ -132,9 +135,10 @@ function Shop() {
         if (storedEmail) setEmail(storedEmail);
         // Si pas de crédits stockés, on utilise la valeur par défaut (125)
         if (storedCredits) {
-            setCredits(parseInt(storedCredits));
+            setPoints(parseInt(storedCredits));
         } else {
             // Sauvegarder les crédits par défaut dans localStorage
+
             localStorage.setItem('credits', '125');
         }
     }, []);
@@ -199,7 +203,7 @@ function Shop() {
                         </div>
                     </div>
                     <div className={`user-credits ${animateCredits ? 'credits-animate' : ''}`}>
-                        {credits} CRÉDITS
+                        {points} CRÉDITS
                     </div>
                 </div>
 
@@ -210,11 +214,11 @@ function Shop() {
                             <p className="item-name">{mob.name.toUpperCase()}</p>
                             <p className="item-cost">coût: {mob.cost}</p>
                             <button
-                                disabled={!isOpen || credits < parseInt(mob.cost)}
-                                className={`invoke-button ${credits < parseInt(mob.cost) ? 'insufficient-credits' : ''}`}
+                                disabled={!isOpen || points < parseInt(mob.cost)}
+                                className={`invoke-button ${points >= parseInt(mob.cost) ? 'affordable' : ''}`}
                                 onClick={() => handleClick(mob.name, mob.cost)}
                             >
-                                {credits < parseInt(mob.cost) ? 'Pas assez de crédits' : 'Invoquer'}
+                                {points < parseInt(mob.cost) ? 'Pas assez de crédits' : 'Invoquer'}
                             </button>
                         </div>
                     ))}
@@ -234,4 +238,4 @@ function Shop() {
     );
 }
 
-export default Shop;
+export default ShopMariem;
