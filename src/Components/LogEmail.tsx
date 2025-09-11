@@ -81,7 +81,7 @@ export default function LogEmail() {
           >
             EMAIL
           </label>
-          
+
           <input
             id="email"
             type="email"
@@ -95,7 +95,7 @@ export default function LogEmail() {
             placeholder="nom.prenom@edu.esiee-it.fr"
             required
           />
-          
+
           {/* Affichage de l'erreur */}
           {error && (
             <motion.div

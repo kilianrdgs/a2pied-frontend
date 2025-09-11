@@ -1,10 +1,7 @@
 import LogEmail from "./Components/LogEmail";
 
 function App() {
-
-	return (
-		<LogEmail />
-	);
+	return <LogEmail />;
 }
 
 export default App;

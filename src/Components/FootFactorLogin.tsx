@@ -3,64 +3,65 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 
 export default function FootFactorLogin() {
-  const [pseudo, setPseudo] = useState("");
-  const navigate = useNavigate();
+	const [pseudo, setPseudo] = useState("");
+	const navigate = useNavigate();
 
-  // Vérification du localStorage au chargement du composant
+    // Vérification du localStorage au chargement du composant
     useEffect(() => {
-      const storedEmail = localStorage.getItem("username");
-      if (storedEmail) {
-        navigate('/shop');
-      }
+        const storedEmail = localStorage.getItem("username");
+        if (storedEmail) {
+            navigate('/shop');
+        }
     }, [navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Pseudo:", pseudo);
-    localStorage.setItem("username", pseudo);
-    navigate("/shop");
-  };
 
-  return (
-    <div className="flex flex-col items-center justify-center ">
-      <motion.img
-        src="/logo.png"
-        alt="Foot Factor Logo"
-        style={{ width: "140px", height: "auto" }}
-        className=" mb-2"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      />
+    const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		console.log("Pseudo:", pseudo);
+		localStorage.setItem("username", pseudo);
+		navigate("/panel");
+	};
 
-      <div className="flex flex-col gap-4 items-center justify-center">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-black border border-red-600 rounded-lg mt-6 p-6 flex flex-col items-center gap-4 shadow-lg shadow-red-900/40"
-        >
-          <label
-            htmlFor="pseudo"
-            className="text-red-600 font-bold tracking-widest"
-          >
-            PSEUDO
-          </label>
-          <input
-            id="pseudo"
-            type="text"
-            value={pseudo}
-            onChange={(e) => setPseudo(e.target.value)}
-            className="w-56 px-3 py-2 bg-black text-red-600 border border-red-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-            placeholder="Entrez votre pseudo"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-red-700 text-black font-bold px-6 py-2 rounded hover:bg-red-800 transition"
-          >
-            COMMENCER
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+	return (
+		<div className="flex flex-col items-center justify-center ">
+			<motion.img
+				src="/logo.png"
+				alt="Foot Factor Logo"
+				style={{ width: "140px", height: "auto" }}
+				className=" mb-2"
+				initial={{ scale: 0.8, opacity: 0 }}
+				animate={{ scale: 1, opacity: 1 }}
+				transition={{ duration: 0.6 }}
+			/>
+
+			<div className="flex flex-col gap-4 items-center justify-center">
+				<form
+					onSubmit={handleSubmit}
+					className="bg-black border border-red-600 rounded-lg mt-6 p-6 flex flex-col items-center gap-4 shadow-lg shadow-red-900/40"
+				>
+					<label
+						htmlFor="pseudo"
+						className="text-red-600 font-bold tracking-widest"
+					>
+						PSEUDO
+					</label>
+					<input
+						id="pseudo"
+						type="text"
+						value={pseudo}
+						onChange={(e) => setPseudo(e.target.value)}
+						className="w-56 px-3 py-2 bg-black text-red-600 border border-red-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+						placeholder="Entrez votre pseudo"
+						required
+					/>
+					<button
+						type="submit"
+						className="bg-red-700 text-black font-bold px-6 py-2 rounded hover:bg-red-800 transition"
+					>
+						COMMENCER
+					</button>
+				</form>
+			</div>
+		</div>
+	);
 }
