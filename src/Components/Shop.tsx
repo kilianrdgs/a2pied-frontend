@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { createUser } from '../services/api';
-import type { UserData } from '../services/api';
+import {useEffect, useState} from 'react';
+import type {UserData} from '../services/api';
+import {createUser} from '../services/api';
 import './Shop.css';
 
 import logo from '../../public/logo.png';
@@ -9,9 +9,9 @@ import boiteAffamee from '../../public/logo.png';
 import boitePiegee from '../../public/logo.png';
 import boiteVolante from '../../public/logo.png';
 import boiteColossale from '../../public/logo.png';
-import { type WebsocketCommunicationC2SType, WebsocketEventC2SEnum } from "../utils/WebsocketCommunicationC2SType.ts";
-import { useAppWebSocket } from "../utils/useAppWebSocket.ts";
-import { useNavigate } from 'react-router-dom';
+import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "../utils/WebsocketCommunicationC2SType.ts";
+import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
+import {useNavigate} from 'react-router-dom';
 
 // Un seul type pour les mobs
 interface MobType {
@@ -66,19 +66,19 @@ function Shop() {
         localStorage.removeItem('username');
         localStorage.removeItem('exist');
         localStorage.removeItem('credits');
-        
+
         // Afficher un message de déconnexion
         showPopupMessage('Déconnexion réussie !', 'success');
-        
+
         // Rediriger vers la page de connexion après un délai
         setTimeout(() => {
             navigate('/');
         }, 500);
     };
 
-    const handleClick = (id: string, mobName: string, mobCost: string) => {
+    const handleClick = (mobName: string, mobCost: string) => {
         const cost = parseInt(mobCost);
-        
+
         // Vérifier si assez de crédits
         if (credits < cost) {
             showPopupMessage(`Pas assez de crédits ! Il vous faut ${cost} crédits pour invoquer ${mobName}.`, 'error');
@@ -89,7 +89,7 @@ function Shop() {
         const newCredits = credits - cost;
         setCredits(newCredits);
         localStorage.setItem('credits', newCredits.toString());
-        
+
         // Animation et popup de succès
         animateCreditsDecrease();
         showPopupMessage(`${mobName} invoqué avec succès ! -${cost} crédits`, 'success');
@@ -97,7 +97,7 @@ function Shop() {
         // Envoyer le message websocket
         const msg: WebsocketCommunicationC2SType = {
             event: WebsocketEventC2SEnum.MONSTER_BOUGHT,
-            data: { id },
+            data: {monsterName: mobName, userEmail: email}
         };
         sendJsonMessage(msg);
     };
@@ -113,10 +113,10 @@ function Shop() {
                 console.error('Erreur lors de la récupération des mobs:', error);
                 // Fallback avec des données par défaut
                 setMobs([
-                    { _id: "1", name: 'BOITE AFFAMÉE', cost: '10', life: '50', damage: 10 },
-                    { _id: "2", name: 'BOITE PIÉGÉE', cost: '30', life: '50', damage: 10 },
-                    { _id: "3", name: 'BOITE VOLANTE', cost: '50', life: '50', damage: 10 },
-                    { _id: "4", name: 'BOITE COLOSSALE', cost: '200', life: '50', damage: 10 }
+                    {_id: "1", name: 'BOITE AFFAMÉE', cost: '10', life: '50', damage: 10},
+                    {_id: "2", name: 'BOITE PIÉGÉE', cost: '30', life: '50', damage: 10},
+                    {_id: "3", name: 'BOITE VOLANTE', cost: '50', life: '50', damage: 10},
+                    {_id: "4", name: 'BOITE COLOSSALE', cost: '200', life: '50', damage: 10}
                 ]);
             }
         };
@@ -127,7 +127,7 @@ function Shop() {
         const storedUsername = localStorage.getItem('username');
         const storedEmail = localStorage.getItem('email');
         const storedCredits = localStorage.getItem('credits');
-        
+
         if (storedUsername) setUsername(storedUsername);
         if (storedEmail) setEmail(storedEmail);
         // Si pas de crédits stockés, on utilise la valeur par défaut (125)
@@ -140,7 +140,7 @@ function Shop() {
     }, []);
 
     // Save to database when values change
-    useEffect(() => {        
+    useEffect(() => {
         if (username !== 'MAITRE AXEL' && email !== 'test@gmail.com') {
             if (localStorage.getItem('exist') === 'false') {
                 saveUserToDatabase();
@@ -158,7 +158,7 @@ function Shop() {
                 mail: email,
                 pseudo: username
             };
-            
+
             await createUser(userData);
             setIsUserSaved(true);
         } catch (error) {
@@ -178,10 +178,10 @@ function Shop() {
             )}
 
             <header className="shop-header">
-                <img src={logo} alt="Foot Factor Logo" className="shop-logo" />
+                <img src={logo} alt="Foot Factor Logo" className="shop-logo"/>
                 <h1>FOOT FACTOR</h1>
                 {/* Bouton de déconnexion - Desktop */}
-                <button 
+                <button
                     className="logout-button logout-button-desktop"
                     onClick={handleLogout}
                 >
@@ -192,7 +192,7 @@ function Shop() {
             <main className="shop-main">
                 <div className="user-info-bar">
                     <div className="user-details">
-                        <img src={avatar} alt="Maitre Axel" className="user-avatar" />
+                        <img src={avatar} alt="Maitre Axel" className="user-avatar"/>
                         <div>
                             <p className="user-name">{username.toUpperCase()}</p>
                             <p className="user-email">{email}</p>
@@ -206,13 +206,13 @@ function Shop() {
                 <div className="shop-grid">
                     {mobs.map((mob) => (
                         <div key={mob._id} className="shop-item-card">
-                            <img src={getMobImage(mob.name)} alt={mob.name} className="item-image" />
+                            <img src={getMobImage(mob.name)} alt={mob.name} className="item-image"/>
                             <p className="item-name">{mob.name.toUpperCase()}</p>
                             <p className="item-cost">coût: {mob.cost}</p>
-                            <button 
-                                disabled={!isOpen || credits < parseInt(mob.cost)} 
+                            <button
+                                disabled={!isOpen || credits < parseInt(mob.cost)}
                                 className={`invoke-button ${credits < parseInt(mob.cost) ? 'insufficient-credits' : ''}`}
-                                onClick={() => handleClick(mob._id, mob.name, mob.cost)}
+                                onClick={() => handleClick(mob.name, mob.cost)}
                             >
                                 {credits < parseInt(mob.cost) ? 'Pas assez de crédits' : 'Invoquer'}
                             </button>
@@ -223,7 +223,7 @@ function Shop() {
 
             {/* Bouton de déconnexion - Mobile */}
             <div className="mobile-logout-container">
-                <button 
+                <button
                     className="logout-button logout-button-mobile"
                     onClick={handleLogout}
                 >
