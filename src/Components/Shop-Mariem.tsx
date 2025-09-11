@@ -109,7 +109,10 @@ function ShopMariem() {
     useEffect(() => {
         const fetchMobs = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/mobtypes');
+
+                const URL = import.meta.env.VITE_API_BASE_URL
+                const response = await fetch(`${URL}/api/mobtypes`);
+
                 const data: MobType[] = await response.json();
                 setMobs(data);
             } catch (error) {

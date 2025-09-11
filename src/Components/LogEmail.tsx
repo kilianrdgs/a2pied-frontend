@@ -32,7 +32,8 @@ export default function LogEmail() {
 
         try {
             // Fetch de la DB
-            const response = await fetch("http://localhost:3000/api/users");
+            const URL = import.meta.env.VITE_API_BASE_URL
+            const response = await fetch(`${URL}/api/users`);
             const users = await response.json();
 
             // Vérifie si l'email soumis existe dans la DB
