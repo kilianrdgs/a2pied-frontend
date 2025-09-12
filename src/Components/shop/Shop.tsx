@@ -233,9 +233,7 @@ export default function Shop() {
 								}`}
 								onClick={() => handleClick(mob.name, mob.cost)}
 							>
-								{points < parseInt(mob.cost)
-									? "Pas assez de crédits"
-									: "Invoquer"}
+								{points < parseInt(mob.cost) ? "Insuffisant" : "Invoquer"}
 							</button>
 						</div>
 					))}
