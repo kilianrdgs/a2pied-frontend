@@ -6,8 +6,6 @@ import {EmailToast} from "./EmailToast.tsx";
 
 interface Toast {
     id: string
-    sender: string
-    subject: string
     preview: string
 }
 
@@ -34,7 +32,7 @@ export function ToastProvider({children}: ToastProviderProps) {
     const [toasts, setToasts] = useState<Toast[]>([])
 
     const addToast = useCallback((toast: Omit<Toast, "id">) => {
-        const id = Math.random().toString(36).substr(2, 9)
+        const id = Math.random().toString(36).substring(2, 11);
         setToasts((prev) => [...prev, {...toast, id}])
     }, [])
 
@@ -45,15 +43,12 @@ export function ToastProvider({children}: ToastProviderProps) {
     return (
         <ToastContext.Provider value={{addToast, removeToast}}>
             {children}
-
             <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 max-h-screen overflow-y-auto">
                 {toasts.map((toast, index) => (
                     <EmailToast
                         key={toast.id}
                         isVisible={true}
                         onClose={() => removeToast(toast.id)}
-                        sender={toast.sender}
-                        subject={toast.subject}
                         preview={toast.preview}
                         stackIndex={index}
                     />

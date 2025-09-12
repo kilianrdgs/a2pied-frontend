@@ -5,7 +5,8 @@ function App() {
 
     return (
         <ToastProvider>
-            <Shop/></ToastProvider>
+            <Shop/>
+        </ToastProvider>
     );
 }
 

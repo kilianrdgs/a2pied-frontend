@@ -9,9 +9,9 @@ import boiteAffamee from '../../public/logo.png';
 import boitePiegee from '../../public/logo.png';
 import boiteVolante from '../../public/logo.png';
 import boiteColossale from '../../public/logo.png';
-import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
 import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum} from "../utils/WebsocketCommunicationC2SType.ts";
 import {useToast} from "./ToastManager.tsx";
+import {useAppWebSocket} from "../utils/useAppWebSocket.ts";
 import {type IMobType, WebsocketEventS2CEnum} from "../utils/WebsocketCommunicationS2CType.ts";
 
 const shopItems = [
@@ -48,38 +48,27 @@ const shopItems = [
 function Shop() {
     const [username, setUsername] = useState('MAITRE AXEL');
     const [email, setEmail] = useState('test@gmail.com');
-    //todo : fix l'utilisation de  'is loading'
-    /*
-        const [isLoading,setIsLoading] = useState(false);
-    */
     const [isUserSaved, setIsUserSaved] = useState(false);
     const {isOpen, sendJsonMessage, lastJsonMessage} = useAppWebSocket({autoSyn: true, email});
     const {addToast} = useToast()
 
     useEffect(() => {
-        console.log('Receive a JSON :')
-        console.log(lastJsonMessage?.event);
         if (lastJsonMessage?.event === WebsocketEventS2CEnum.MONSTER_KILL) {
             const mobType = lastJsonMessage?.data?.mobType as IMobType
             addToast({
-                sender: email,
-                subject: "Aïe aïe aïe",
                 preview: `Ton ${mobType.name} est mort !`,
             })
         }
     }, [lastJsonMessage])
 
     const handleClick = (name: string) => {
-        addToast({
-            sender: email,
-            subject: "Aïe aïe aïe",
-            preview: `Ton 'TEST' est mort !`,
-        })
         const msg: WebsocketCommunicationC2SType = {
             event: WebsocketEventC2SEnum.MONSTER_BOUGHT,
             data: {monsterName: name, userEmail: email},
         };
+
         sendJsonMessage(msg);
+
     };
 
     // Load data from localStorage
@@ -107,9 +96,6 @@ function Shop() {
             return;
         }
 
-        /*
-                setIsLoading(true);
-        */
         try {
             const userData: UserData = {
                 mail: email,
@@ -120,10 +106,6 @@ function Shop() {
             setIsUserSaved(true);
         } catch (error) {
             console.error('Error saving user to DB:', error);
-        } finally {
-            /*
-                        setIsLoading(false);
-            */
         }
     };
     return (

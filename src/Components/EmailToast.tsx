@@ -5,17 +5,16 @@ import {useEffect, useState} from "react"
 interface EmailToastProps {
     isVisible: boolean
     onClose: () => void
-    sender: string
-    subject: string
     preview: string
     stackIndex?: number
 }
 
+export const EMAIL_TEMPLATE = {title: "MAUVAISE NOUVELLE"}
+
 export function EmailToast({
                                isVisible,
                                onClose,
-                               sender,
-                               subject,
+
                                preview,
                                stackIndex = 0,
                            }: EmailToastProps) {
@@ -37,72 +36,42 @@ export function EmailToast({
     if (!isVisible) return null
 
     return (
+
         <div
+            style={{
+                transitionDelay: `${stackIndex * 150}ms`,
+            }}
             className={
-                `w-96 bg-black border border-border rounded-lg shadow-lg overflow-hidden transition-all duration-300 ease-out ` +
+                `w-96 transition-all duration-300 ease-out ` +
                 (isAnimating ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-full opacity-0 scale-95')
             }
-            style={{
-                animationDelay: `${stackIndex * 100}ms`,
-            }}
+
         >
-            <div className={`bg-muted/50 px-4 py-2 border-b border-border flex items-center justify-between`}>
-                <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-xs font-medium text-muted-foreground">Nouveau message</span>
-                </div>
-                <button onClick={handleClose} className="text-muted-foreground hover:text-foreground transition-colors">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-
-            {/* Contenu email */}
-            <div className="p-4 space-y-3">
-                {/* Expéditeur */}
-                <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                        <span
-                            className="text-xs font-semibold text-primary-foreground">{sender.charAt(0).toUpperCase()}</span>
+            <div className="bg-black border-2 border-red-600 rounded-lg p-4 max-w-sm shadow-2xl relative">
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <div
+                            className="w-fit h-fit bg-gradient-to-br from-rose-500 via-pink-300 to-red-800 rounded-lg p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width={30} height={30} viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                      d="M8 22L5 8l3-6h8l3 6l-3 14zm3-16v2H9v2h2v5h2v-5h2V8h-2V6z"></path>
+                            </svg>
+                        </div>
+                        <div className="border-b border-red-600/30 pb-2">
+                            <h4 className="text-white font-medium text-sm leading-tight">{EMAIL_TEMPLATE.title}</h4>
+                        </div>
+                        <button onClick={handleClose}
+                                className="text-red-500 hover:text-red-400 hover:cursor-pointer transition-colors">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 30 30">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3}
+                                      d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{sender}</p>
+                    <div className="space-y-2">
+                        <p className="text-gray-300 text-xs leading-relaxed">{preview}</p>
                     </div>
                 </div>
-
-                {/* Sujet */}
-                <div>
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-1">{subject}</h3>
-                </div>
-
-                {/* Aperçu */}
-                <div>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{preview}</p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex space-x-2 pt-2">
-                    <button
-                        className="flex-1 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors">
-                        Lire
-                    </button>
-                    <button
-                        className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted transition-colors">
-                        Archiver
-                    </button>
-                </div>
-            </div>
-
-            {/* Barre de progression pour l'auto-close */}
-            <div className="h-1 bg-muted">
-                <div
-                    className="h-full bg-primary transition-all duration-5000 ease-linear"
-                    style={{
-                        width: isAnimating ? "0%" : "100%",
-                        transitionDuration: isAnimating ? "5000ms" : "0ms",
-                    }}
-                />
             </div>
         </div>
     )
