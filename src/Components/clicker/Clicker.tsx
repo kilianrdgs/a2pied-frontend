@@ -15,23 +15,25 @@ export default function Clicker() {
 	};
 
 	return (
-		<div
-			style={{
-				height: "150px",
-				width: "150px",
-				display: "flex",
-				flexDirection: "column",
-				alignItems: "center",
-				gap: "1rem",
-			}}
-		>
-			<img
-				src={logo}
-				alt="logo"
-				className={`clicker-logo ${isPulsing ? "pulse" : ""}`}
-				onClick={handleClick}
-				style={{ width: "150px", cursor: "pointer", margin: "auto" }}
-			/>
+		<div className="clicker-container">
+			<div
+				style={{
+					height: "150px",
+					width: "150px",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+					gap: "1rem",
+				}}
+			>
+				<img
+					src={logo}
+					alt="logo"
+					className={`clicker-logo ${isPulsing ? "pulse" : ""}`}
+					onClick={handleClick}
+					style={{ width: "150px", cursor: "pointer", margin: "auto" }}
+				/>
+			</div>
 		</div>
 	);
 }

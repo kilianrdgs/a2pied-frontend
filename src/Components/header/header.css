@@ -1,0 +1,22 @@
+.shop-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px;
+}
+
+.shop-header-left {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.shop-logo {
+	width: 80px;
+}
+h1 {
+	font-size: 20px;
+	font-weight: bold;
+	color: var(--primary-red);
+	text-shadow: 0 0 5px var(--primary-red);
+}
