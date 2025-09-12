@@ -5,6 +5,7 @@ import "./index.css";
 import FootFactorLogin from "./Components/FootFactorLogin";
 import LogEmail from "./Components/LogEmail.tsx";
 import Panel from "./Components/panel/Panel.tsx";
+import App from "./App.tsx";
 
 createRoot(document.getElementById("root")!).render(
 	<BrowserRouter>

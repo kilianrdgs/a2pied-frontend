@@ -1,7 +1,13 @@
-import LogEmail from "./Components/LogEmail";
+import Shop from "./Components/Shop.tsx";
+import {ToastProvider} from "./Components/ToastManager.tsx";
 
 function App() {
-	return <LogEmail />;
+
+    return (
+        <ToastProvider>
+            <Shop/>
+        </ToastProvider>
+    );
 }
 
 export default App;

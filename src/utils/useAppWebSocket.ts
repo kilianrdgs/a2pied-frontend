@@ -15,11 +15,15 @@ type UseAppWebSocketOptions = {
 export function useAppWebSocket(options: UseAppWebSocketOptions) {
 	const url: string = getWebSocketURL();
 
-	const { lastJsonMessage, readyState, sendJsonMessage, sendMessage } =
-		useWebSocket(`${url}?token=${options.email}`, {
-			share: true,
-			shouldReconnect: () => true,
-		});
+    const {
+        lastJsonMessage,
+        readyState,
+        sendJsonMessage,
+        sendMessage
+    } = useWebSocket<WebsocketCommunicationS2CType>(`${url}?token=${options.email}`, {
+        share: true,
+        shouldReconnect: () => true,
+    });
 
 	useEffect(() => {
 		if (readyState === ReadyState.OPEN && options?.autoSyn !== false) {
