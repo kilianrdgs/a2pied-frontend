@@ -1,6 +1,4 @@
 import {useEffect, useState} from "react";
-import type {UserData} from "../../services/api.ts";
-import {createUser} from "../../services/api.ts";
 import "./shop.css";
 
 import avatar from "/logo.png";
@@ -13,6 +11,7 @@ import {useAppWebSocket} from "../../utils/useAppWebSocket.ts";
 import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum,} from "../../utils/WebsocketCommunicationC2SType.ts";
 import {type IMobType, WebsocketEventS2CEnum} from "../../utils/WebsocketCommunicationS2CType.ts";
 import {useToast} from "../ToastManager.tsx";
+import {useLoginFromLocalStorage} from "../../utils/useLoginFromLocalStorage.tsx";
 
 // Un seul type pour les mobs
 interface MobType {
@@ -24,9 +23,7 @@ interface MobType {
 }
 
 export default function Shop() {
-    const [username, setUsername] = useState("MAITRE AXEL");
-    const [email, setEmail] = useState("test@gamil.com");
-    const [isUserSaved, setIsUserSaved] = useState(false);
+    const {username, email} = useLoginFromLocalStorage()
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState("");
     const [popupType, setPopupType] = useState<"success" | "error">("success");
@@ -34,7 +31,7 @@ export default function Shop() {
     const [mobs, setMobs] = useState<MobType[]>([]);
     const points = usePointsStore((state) => state.points);
     const setPoints = usePointsStore((state) => state.setPoints);
-    const {isOpen, sendJsonMessage, lastJsonMessage} = useAppWebSocket({autoSyn: true, email});
+    const {isOpen, sendJsonMessage, lastJsonMessage} = useAppWebSocket({email});
     const {addToast} = useToast()
 
 
@@ -95,10 +92,13 @@ export default function Shop() {
     };
     useEffect(() => {
         if (lastJsonMessage?.event === WebsocketEventS2CEnum.MONSTER_KILL) {
-            const mobType = lastJsonMessage?.data?.mobType as IMobType
-            addToast({
-                preview: `Ton ${mobType.name} est mort !`,
-            })
+            const {data} = lastJsonMessage;
+            if (data && 'mobType' in data) {
+                const mobType = data.mobType as IMobType
+                addToast({
+                    preview: `Ton ${mobType.name} est mort !`,
+                })
+            }
         }
     }, [lastJsonMessage])
 
@@ -149,13 +149,8 @@ export default function Shop() {
 
         fetchMobs();
 
-        // Load localStorage data
-        const storedUsername = localStorage.getItem("username");
-        const storedEmail = localStorage.getItem("email");
         const storedCredits = localStorage.getItem("credits");
 
-        if (storedUsername) setUsername(storedUsername);
-        if (storedEmail) setEmail(storedEmail);
         // Si pas de crédits stockés, on utilise la valeur par défaut (125)
         if (storedCredits) {
             setPoints(parseInt(storedCredits));
@@ -166,35 +161,6 @@ export default function Shop() {
         }
     }, []);
 
-    // Save to database when values change
-    useEffect(() => {
-        if (username !== "MAITRE AXEL" && email !== "test@gmail.com") {
-            if (localStorage.getItem("exist") === "false") {
-                saveUserToDatabase();
-                localStorage.setItem("exist", "true");
-            }
-        }
-    }, [username, email]);
-
-    const saveUserToDatabase = async () => {
-        if (
-            isUserSaved ||
-            (username === "MAITRE AXEL" && email === "test@gmail.com")
-        ) {
-            return;
-        }
-        try {
-            const userData: UserData = {
-                mail: email,
-                pseudo: username,
-            };
-
-            await createUser(userData);
-            setIsUserSaved(true);
-        } catch (error) {
-            console.error("Error saving user to DB:", error);
-        }
-    };
 
     return (
         <div className="shop-container">

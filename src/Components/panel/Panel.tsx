@@ -3,6 +3,7 @@ import Header from "../header/Header";
 import Shop from "../shop/Shop";
 import "./panel.css";
 import {ToastProvider} from "../ToastManager.tsx";
+import Feed from "../feed/Feed.tsx";
 
 export function Panel() {
     return (
@@ -16,6 +17,7 @@ export function Panel() {
                     <main className="panel__right">
                         <Clicker/>
                     </main>
+                    <Feed/>
                 </div>
             </ToastProvider>
 
