@@ -4,10 +4,6 @@ import { createUser } from "../../services/api.ts";
 import "./shop.css";
 
 import avatar from "/logo.png";
-import boiteAffamee from "/logo.png";
-import boitePiegee from "/logo.png";
-import boiteVolante from "/logo.png";
-import boiteColossale from "/logo.png";
 import { usePointsStore } from "../../utils/pointsStore.ts";
 import { useAppWebSocket } from "../../utils/useAppWebSocket.ts";
 import {
@@ -47,16 +43,6 @@ export default function Shop() {
     email,
   });
   const { addToast } = useToast();
-
-  // Fonction pour récupérer l'image basée sur le nom
-  const getMobImage = (name: string): string => {
-    const n = name.toLowerCase();
-    if (n.includes("affamee")) return boiteAffamee;
-    if (n.includes("piegee")) return boitePiegee;
-    if (n.includes("volante")) return boiteVolante;
-    if (n.includes("colossale")) return boiteColossale;
-    return boiteAffamee;
-  };
 
   // Fonction pour afficher une popup
   const showPopupMessage = (message: string, type: "success" | "error") => {
