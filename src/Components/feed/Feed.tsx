@@ -25,21 +25,27 @@ export default function Feed() {
     useEffect(() => {
         if (lastJsonMessage && lastJsonMessage.data) {
             const {data} = lastJsonMessage
+            console.log(lastJsonMessage)
             if (lastJsonMessage?.event === WebsocketEventS2CEnum.BROADCAST) {
-                if ('event' in data && 'data' in data) {
-                    const {data: deepData} = data;
-                    if (typeof deepData === "object" && 'userPseudo' in deepData && 'monsterName' in deepData) {
-                        const newEvent: NewEvent = {
-                            id: Date.now().toString() + Math.random(),
-                            type: data?.event as WebsocketEventC2SEnum,
-                            userPseudo: deepData?.userPseudo as string,
-                            monsterName: deepData?.monsterName as string,
-                            timestamp: new Date(parseInt(data?.timestamp as string))
+                if ('event' in data) {
+                    if ('data' in data) {
+                        const {data: deepData} = data;
+                        if (typeof deepData === "object" && 'userPseudo' in deepData && 'monsterName' in deepData) {
+                            const newEvent: NewEvent = {
+                                id: Date.now().toString() + Math.random(),
+                                type: data?.event as WebsocketEventC2SEnum,
+                                userPseudo: deepData?.userPseudo as string,
+                                monsterName: deepData?.monsterName as string,
+                                timestamp: new Date(parseInt(data?.timestamp as string))
+                            }
+                            setEvents([...events, newEvent])
+                        } else if (typeof deepData === "object" && 'action' in deepData) {
+                            if (deepData.action === "reset") {
+                                setEvents([])
+                            }
                         }
-                        setEvents([...events, newEvent])
-
-                        console.log(newEvent)
                     }
+
                 }
             }
         }
