@@ -1,5 +1,13 @@
 .upgrade-grid {
-  display: flex;
+	display: flex;
+	flex-direction: column;
+	height: 150px;
+	align-items: start;
+}
 
-  height: 100px;
+.upgrade-grid-container {
+	display: flex;
+	height: 100%;
+	width: 100%;
+	gap: 10px;
 }
