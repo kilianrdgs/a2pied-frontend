@@ -3,8 +3,10 @@ import Header from "../header/Header";
 import Shop from "../shop/Shop";
 import "./panel.css";
 import {ToastProvider} from "../ToastManager.tsx";
+import {useNavigate} from "react-router";
 
 export function Panel() {
+    const navigate = useNavigate()
     return (
         <div className="panel-container">
             <ToastProvider>
@@ -18,6 +20,7 @@ export function Panel() {
                     <main className="panel__right">
                         <Clicker/>
                     </main>
+                    <button onClick={() => navigate('/feed')}> Feed</button>
                 </div>
             </ToastProvider>
         </div>
