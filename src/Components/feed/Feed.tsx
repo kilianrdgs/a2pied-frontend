@@ -25,7 +25,6 @@ export default function Feed() {
     useEffect(() => {
         if (lastJsonMessage && lastJsonMessage.data) {
             const {data} = lastJsonMessage
-            console.log(lastJsonMessage)
             if (lastJsonMessage?.event === WebsocketEventS2CEnum.BROADCAST) {
                 if ('event' in data) {
                     if ('data' in data) {
