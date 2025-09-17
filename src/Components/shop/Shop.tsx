@@ -1,10 +1,8 @@
 import {useEffect, useState} from "react";
-import { useEffect, useState } from "react";
-import type { UserData } from "../../services/api.ts";
-import { createUser } from "../../services/api.ts";
 import "./shop.css";
 
 import avatar from "/logo.png";
+
 import {usePointsStore} from "../../utils/pointsStore.ts";
 import {useAppWebSocket} from "../../utils/useAppWebSocket.ts";
 import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum,} from "../../utils/WebsocketCommunicationC2SType.ts";
@@ -13,15 +11,7 @@ import {useToast} from "../ToastManager.tsx";
 import MobsGrid from "./mobsgrid/MobsGrid.tsx";
 import UpgradesGrid from "./upgradesGrid/UpgradeGrid.tsx";
 import {useLoginFromLocalStorage} from "../../utils/useLoginFromLocalStorage.tsx";
-import boiteAffamee from "/logo.png";
-import boitePiegee from "/logo.png";
-import boiteVolante from "/logo.png";
-import boiteColossale from "/logo.png";
-import { usePointsStore } from "../../utils/pointsStore.ts";
-import { useAppWebSocket } from "../../utils/useAppWebSocket.ts";
-import { type WebsocketCommunicationC2SType, WebsocketEventC2SEnum, } from "../../utils/WebsocketCommunicationC2SType.ts";
-import { type IMobType, WebsocketEventS2CEnum } from "../../utils/WebsocketCommunicationS2CType.ts";
-import { useToast } from "../ToastManager.tsx";
+
 
 // Un seul type pour les mobs
 export interface MobType {
@@ -50,14 +40,6 @@ export default function Shop() {
         loadCreditsFromBackend,
     } = usePointsStore();
     // Fonction pour récupérer l'image basée sur le nom
-    const getMobImage = (name: string): string => {
-        const n = name.toLowerCase();
-        if (n.includes("affamee")) return boiteAffamee;
-        if (n.includes("piegee")) return boitePiegee;
-        if (n.includes("volante")) return boiteVolante;
-        if (n.includes("colossale")) return boiteColossale;
-        return boiteAffamee;
-    };
 
     // Fonction pour afficher une popup
     const showPopupMessage = (message: string, type: "success" | "error"): void => {
@@ -98,7 +80,7 @@ export default function Shop() {
         // Envoyer le message websocket
         const msg: WebsocketCommunicationC2SType = {
             event: WebsocketEventC2SEnum.MONSTER_BOUGHT,
-            data: { monsterName: mobName, userEmail: email },
+            data: {monsterName: mobName, userEmail: email},
         };
         sendJsonMessage(msg);
     };
@@ -130,37 +112,6 @@ export default function Shop() {
                 setMobs(data);
             } catch (error) {
                 console.error("Erreur lors de la récupération des mobs:", error);
-                // Fallback avec des données par défaut
-                setMobs([
-                    {
-                        _id: "1",
-                        name: "BOITE AFFAMÉE",
-                        cost: "10",
-                        life: "50",
-                        damage: 10,
-                    },
-                    {
-                        _id: "2",
-                        name: "BOITE PIÉGÉE",
-                        cost: "30",
-                        life: "50",
-                        damage: 10,
-                    },
-                    {
-                        _id: "3",
-                        name: "BOITE VOLANTE",
-                        cost: "50",
-                        life: "50",
-                        damage: 10,
-                    },
-                    {
-                        _id: "4",
-                        name: "BOITE COLOSSALE",
-                        cost: "200",
-                        life: "50",
-                        damage: 10,
-                    },
-                ]);
             }
         };
 
@@ -189,7 +140,7 @@ export default function Shop() {
             <main className="shop-main">
                 <div className="user-info-bar">
                     <div className="user-details">
-                        <img src={avatar} alt="Maitre Axel" className="user-avatar" />
+                        <img src={avatar} alt="Maitre Axel" className="user-avatar"/>
                         <div>
                             <p className="user-name">{username.toUpperCase()}</p>
                             <p className="user-email">{email}</p>
