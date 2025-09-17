@@ -24,6 +24,7 @@ export interface MobType {
     name: string;
     life: string;
     damage: number;
+    description: string;
 }
 
 export default function Shop() {
@@ -34,7 +35,7 @@ export default function Shop() {
     const [animateCredits, setAnimateCredits] = useState<boolean>(false);
     const [mobs, setMobs] = useState<MobType[]>([]);
 
-    const {isOpen, sendJsonMessage, lastJsonMessage} = useAppWebSocket({email});
+    const {sendJsonMessage, lastJsonMessage} = useAppWebSocket({email});
     const {addToast} = useToast()
 
     const {
@@ -187,8 +188,6 @@ export default function Shop() {
                     <div style={{display: "flex", flexDirection: "column", gap: 5}}>
                         <MobsGrid
                             mobs={mobs}
-                            isOpen={isOpen}
-                            points={points}
                             onMobClick={handleClick}
                         />
                         <UpgradesGrid/>
