@@ -6,7 +6,11 @@ import avatar from "/logo.png";
 import {usePointsStore} from "../../utils/pointsStore.ts";
 import {useAppWebSocket} from "../../utils/useAppWebSocket.ts";
 import {type WebsocketCommunicationC2SType, WebsocketEventC2SEnum,} from "../../utils/WebsocketCommunicationC2SType.ts";
-import {type IMobType, WebsocketEventS2CEnum,} from "../../utils/WebsocketCommunicationS2CType.ts";
+import {
+    type IMobType,
+    type WebsocketCommunicationS2CPayload,
+    WebsocketEventS2CEnum,
+} from "../../utils/WebsocketCommunicationS2CType.ts";
 import {useToast} from "../ToastManager.tsx";
 import MobsGrid from "./mobsgrid/MobsGrid.tsx";
 import UpgradesGrid from "./upgradesGrid/UpgradeGrid.tsx";
@@ -86,14 +90,35 @@ export default function Shop() {
     };
 
     useEffect(() => {
-        if (lastJsonMessage?.event === WebsocketEventS2CEnum.MONSTER_KILL) {
-            const {data} = lastJsonMessage;
-            if (data && 'mobType' in data) {
-                const mobType = data.mobType as IMobType
-                addToast({
-                    preview: `Ton ${mobType.name} est mort !`,
-                })
+        if (!lastJsonMessage || !lastJsonMessage.data) return;
+
+        const {event, data} = lastJsonMessage;
+
+        const handleMonsterKill = (data: WebsocketCommunicationS2CPayload) => {
+            if ('mobType' in data) {
+                const mobType = data.mobType as IMobType;
+                addToast({preview: `Ton ${mobType.name} est mort !`});
             }
+        };
+
+        const handleBroadcast = (data: WebsocketCommunicationS2CPayload) => {
+            if ('event' in data && data.event === "UPDATE_STATE" && 'data' in data && typeof data.data === "object") {
+                const deepData = data.data;
+                if ('action' in deepData && deepData.action === "reset") {
+                    loadCreditsFromBackend();
+                }
+            }
+        };
+
+        switch (event) {
+            case WebsocketEventS2CEnum.MONSTER_KILL:
+                handleMonsterKill(data);
+                break;
+            case WebsocketEventS2CEnum.BROADCAST:
+                handleBroadcast(data);
+                break;
+            default:
+                break;
         }
     }, [lastJsonMessage, addToast]);
 
