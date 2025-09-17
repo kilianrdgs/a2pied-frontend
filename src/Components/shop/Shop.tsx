@@ -35,6 +35,8 @@ export default function Shop() {
     const [animateCredits, setAnimateCredits] = useState<boolean>(false);
     const [mobs, setMobs] = useState<MobType[]>([]);
 
+    const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+
     const {sendJsonMessage, lastJsonMessage} = useAppWebSocket({email});
     const {addToast} = useToast()
 
@@ -151,9 +153,44 @@ export default function Shop() {
 
     }, [setPoints]);
 
+    
+    // New useEffect for welcome popup
+    useEffect(() => {
+        // Check if this is the user's first visit to this page
+        const hasSeenWelcome = localStorage.getItem(`shop-welcome-${email}`);
+        
+        if (!hasSeenWelcome) {
+            const timer = setTimeout(() => {
+                setShowWelcomePopup(true);
+            }, 500); // lil delay so the page loads
+
+            // Hide popup after 3s
+            const hideTimer = setTimeout(() => {
+                setShowWelcomePopup(false);
+                // Mark as seen so it doesn't show again
+                localStorage.setItem(`shop-welcome-${email}`, 'true');
+            }, 3500); // 500ms delay + 3000ms display
+
+            return () => {
+                clearTimeout(timer);
+                clearTimeout(hideTimer);
+            };
+        }
+    }, [email]);
+
 
     return (
         <div className="shop-container">
+
+            {/* Welcome Guide popup*/}
+            {showWelcomePopup && (
+                <div className="popup welcome-popup">
+                    <div className="popup-content">
+                        <p>Cliquer sur le monstre pour gagner plus de crédits !</p>
+                    </div>
+                </div>
+            )}
+
             {/* Popup */}
             {showPopup && (
                 <div className={`popup ${popupType}`}>
