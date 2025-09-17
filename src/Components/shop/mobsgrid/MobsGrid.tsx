@@ -19,7 +19,7 @@ export default function MobsGrid({
                     <div className="shop-item-card">
                         <div key={mob._id} className="shop-item-info">
                             <img
-                                src="../../../public/monster.png"
+                                src="/monster.png"
                                 alt={mob.name}
                                 className="item-image"
                             />
