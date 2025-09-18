@@ -1,0 +1,11 @@
+.upgrade-card {
+	border: 2px solid #222;
+	padding: 5px;
+	box-sizing: border-box;
+	border-radius: 8px;
+	flex: 0 0 auto;
+	width: 250px;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}

@@ -1,5 +1,5 @@
 .panel-container {
-    /*    position: absolute;
+	/*    position: absolute;
         top: 50%;
         left: 50%;
         display: flex;
@@ -10,50 +10,50 @@
 }
 
 .panel {
-    display: flex;
-    gap: 24px;
-    background-color: #111;
-    padding: 16px;
-    border: 1px solid #222;
-    border-radius: 12px;
+	display: flex;
+	gap: 10px;
+	background-color: #111;
+	padding: 16px;
+	border: 1px solid #222;
+	border-radius: 12px;
 }
 
 .panel__left,
 .panel__right {
-    background-color: var(--card-bg);
-    border: 1px solid #222;
-    border-radius: 12px;
+	background-color: var(--card-bg);
+	border: 1px solid #222;
+	border-radius: 12px;
 }
 
 @media (max-width: 768px) {
-    .panel-container {
-        width: 75vw;
-        display: flex;
-        flex-direction: column;
-    }
+	.panel-container {
+		width: 75vw;
+		display: flex;
+		flex-direction: column;
+	}
 
-    .panel {
-        padding: 5px;
-        display: flex;
-        background-color: black;
-        align-self: center;
-        border: none;
-    }
+	.panel {
+		padding: 5px;
+		display: flex;
+		background-color: black;
+		align-self: center;
+		border: none;
+	}
 }
 
 @media (max-width: 480px) {
-    .panel-container {
-        width: 100%;
-        justify-content: space-around;
-    }
+	.panel-container {
+		width: 100%;
+		justify-content: space-around;
+	}
 
-    .panel {
-        flex-direction: column;
-        padding: 5px;
-        width: 100vw;
+	.panel {
+		flex-direction: column;
+		padding: 5px;
+		width: 100vw;
 
-        background-color: black;
+		background-color: black;
 
-        border: none;
-    }
+		border: none;
+	}
 }

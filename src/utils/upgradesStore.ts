@@ -1,152 +1,160 @@
-import {create} from "zustand";
-import {API_BASE_URL} from "../services/constantes/constantes.ts";
-import {usePointsStore} from "./pointsStore.ts";
+import { create } from "zustand";
+import { API_BASE_URL } from "../services/constantes/constantes.ts";
+import { usePointsStore } from "./pointsStore.ts";
 
-export type UpgradeName = 'AUTO_CREDIT' | 'BUY_5_IN_A_ROW' | 'BUY_10_IN_A_ROW' | 'CREDIT_MULTIPLIER';
+export type UpgradeName =
+	| "AUTO_CREDIT"
+	| "BUY_5_IN_A_ROW"
+	| "BUY_10_IN_A_ROW"
+	| "CREDIT_MULTIPLIER";
 
 export interface UserUpgrade {
-    _id: string
-    name: UpgradeName;
-    level: number;
-    user: string;
+	_id: string;
+	name: UpgradeName;
+	level: number;
+	user: string;
 }
 
 export interface AvailableUpgrade {
-    name: UpgradeName;
-    nextLevel: number;    // Le niveau suivant auquel l'utilisateur peut passer
-    nextCost: number;     // Le coût pour acheter ce niveau
-    description: string;  // Description textuelle de l'upgrade
-    maxLevel: number;     // Niveau maximal de cette upgrade
+	name: UpgradeName;
+	nextLevel: number; // Le niveau suivant auquel l'utilisateur peut passer
+	nextCost: number; // Le coût pour acheter ce niveau
+	description: string; // Description textuelle de l'upgrade
+	maxLevel: number; // Niveau maximal de cette upgrade
 }
 
 export interface UpgradesStoreState {
-    userUpgrades: UserUpgrade[];
-    setUserUpgrades: (userUpgrades: UserUpgrade[]) => void;
-    getUserUpgrades: () => Promise<void>;
+	userUpgrades: UserUpgrade[];
+	setUserUpgrades: (userUpgrades: UserUpgrade[]) => void;
+	getUserUpgrades: () => Promise<void>;
 
-    availablesUpgrades: AvailableUpgrade[];
-    setAvailablesUpgrades: (availableUpgrades: AvailableUpgrade[]) => void;
-    getAvailablesUpgrades: () => Promise<void>
+	availablesUpgrades: AvailableUpgrade[];
+	setAvailablesUpgrades: (availableUpgrades: AvailableUpgrade[]) => void;
+	getAvailablesUpgrades: () => Promise<void>;
 
-    buyUpgrade: (availableUpgrade: AvailableUpgrade) => Promise<void>,
-    updateUpgradeLevel: (id: string, newLevel: number) => Promise<void>;
-    createUpgrade: (name: UpgradeName, userEmail: string) => Promise<void>;
+	buyUpgrade: (availableUpgrade: AvailableUpgrade) => Promise<void>;
+	updateUpgradeLevel: (id: string, newLevel: number) => Promise<void>;
+	createUpgrade: (name: UpgradeName, userEmail: string) => Promise<void>;
 
-    isBuying: boolean;
-    setIsBuying: (value: boolean) => void;
+	isBuying: boolean;
+	setIsBuying: (value: boolean) => void;
 
-    loading: boolean;
-    error: string | null;
-    reset: () => void;
+	loading: boolean;
+	error: string | null;
+	reset: () => void;
 }
 
 export const useUpgradesStore = create<UpgradesStoreState>((set, get) => ({
-    userUpgrades: [],
-    loading: false,
-    error: null,
-    availablesUpgrades: [],
-    isBuying: false,
-    setIsBuying: (value: boolean) => {
-        set(() => ({isBuying: value}))
-    },
+	userUpgrades: [],
+	loading: false,
+	error: null,
+	availablesUpgrades: [],
+	isBuying: false,
+	setIsBuying: (value: boolean) => {
+		set(() => ({ isBuying: value }));
+	},
 
+	setAvailablesUpgrades: (availablesUpgrades) =>
+		set(() => ({ availablesUpgrades })),
 
-    setAvailablesUpgrades: (availablesUpgrades) => set(() => ({availablesUpgrades})),
+	setUserUpgrades: (userUpgrades) => set(() => ({ userUpgrades })),
 
-    setUserUpgrades: (userUpgrades) => set(() => ({userUpgrades})),
+	updateUpgradeLevel: async (id, newLevel) => {
+		const response = await fetch(`${API_BASE_URL}/api/upgrades/`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				upgradeId: id,
+				level: newLevel,
+			}),
+		});
+		if (!response.ok) {
+			set(() => ({
+				error: "Une Erreur lors de la mise à jour est survenue",
+			}));
+		}
+	},
 
-    updateUpgradeLevel: async (id, newLevel) => {
+	getAvailablesUpgrades: async () => {
+		const email = localStorage.getItem("email");
+		const response = await fetch(
+			`${API_BASE_URL}/api/upgrades/available/${email}`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+		const json = await response.json();
+		set(() => ({ availablesUpgrades: json }));
+	},
+	getUserUpgrades: async () => {
+		const email = localStorage.getItem("email");
+		const response = await fetch(`${API_BASE_URL}/api/upgrades/${email}`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		const json = await response.json();
+		set(() => ({ userUpgrades: json }));
+	},
 
-        const response = await fetch(`${API_BASE_URL}/api/upgrades/`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                upgradeId: id,
-                level: newLevel
-            })
-        });
-        if (!response.ok) {
-            set(() => ({
-                error: "Une Erreur lors de la mise à jour est survenue"
-            }))
-        }
-    },
+	reset: () =>
+		set(() => ({
+			userUpgrades: [],
+			loading: false,
+			error: null,
+		})),
+	createUpgrade: async (name: UpgradeName, userEmail: string) => {
+		const response = await fetch(`${API_BASE_URL}/api/upgrades/`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				name: name,
+				userEmail: userEmail,
+			}),
+		});
 
-    getAvailablesUpgrades: async () => {
-        const email = localStorage.getItem('email');
-        const response = await fetch(`${API_BASE_URL}/api/upgrades/available/${email}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        const json = await response.json()
-        set(() => ({availablesUpgrades: json}))
-    },
-    getUserUpgrades: async () => {
-        const email = localStorage.getItem('email');
-        const response = await fetch(`${API_BASE_URL}/api/upgrades/${email}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        const json = await response.json()
-        set(() => ({userUpgrades: json}))
-    },
+		if (!response.ok) set(() => ({ error: "erreur lors de l'achat" }));
+	},
+	buyUpgrade: async (availableUpgrade: AvailableUpgrade) => {
+		set(() => ({ error: "" }));
+		get().setIsBuying(true);
+		const { points, removePoints } = usePointsStore.getState();
 
-    reset: () => set(() => ({
-        userUpgrades: [],
-        loading: false,
-        error: null,
-    })),
-    createUpgrade: async (name: UpgradeName, userEmail: string) => {
-        const response = await fetch(`${API_BASE_URL}/api/upgrades/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name: name,
-                userEmail: userEmail
-            })
-        });
+		if (points >= availableUpgrade.nextCost) {
+			try {
+				if (availableUpgrade.nextLevel > 1) {
+					await get().updateUpgradeLevel(
+						get().userUpgrades.find((u) => u.name === availableUpgrade.name)
+							?._id ?? "",
+						availableUpgrade.nextLevel,
+					);
+				} else {
+					const email = localStorage.getItem("email") ?? "";
+					await get().createUpgrade(availableUpgrade.name, email);
+				}
 
-        if (!response.ok) set(() => ({error: "erreur lors de l'achat"}))
-    }, buyUpgrade: async (availableUpgrade: AvailableUpgrade) => {
-        set(() => ({error: ""}));
-        get().setIsBuying(true)
-        const {points, removePoints} = usePointsStore.getState();
+				removePoints(availableUpgrade.nextCost);
 
-        if (points >= availableUpgrade.nextCost) {
-            try {
-                if (availableUpgrade.nextLevel > 1) {
-                    await get().updateUpgradeLevel(
-                        get().userUpgrades.find(u => u.name === availableUpgrade.name)?._id ?? '',
-                        availableUpgrade.nextLevel
-                    );
-                } else {
-                    const email = localStorage.getItem("email") ?? "";
-                    await get().createUpgrade(availableUpgrade.name, email);
-                }
+				await get().getUserUpgrades();
+				await get().getAvailablesUpgrades();
+				get().setIsBuying(false);
+			} catch (error) {
+				set(() => ({ error: "Erreur lors de l'achat" }));
+			}
+		} else {
+			set(() => ({ error: "Fonds insuffisants" }));
+		}
+	},
 
-                removePoints(availableUpgrade.nextCost);
-
-                await get().getUserUpgrades();
-                await get().getAvailablesUpgrades();
-                get().setIsBuying(false)
-
-            } catch (error) {
-                set(() => ({error: "Erreur lors de l'achat"}));
-            }
-        } else {
-            set(() => ({error: "Fonds insuffisants"}));
-        }
-    }
-
-    /* buyUpgrade: async (availableUpgrade: AvailableUpgrade) => {
+	/* buyUpgrade: async (availableUpgrade: AvailableUpgrade) => {
          set(() => ({error: ""}))
          const updateCurrentUserUprade = () => {
              const userUpgrade = get().userUpgrades.find((userUpgrade) => userUpgrade.name === availableUpgrade.name)

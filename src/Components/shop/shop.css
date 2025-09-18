@@ -105,15 +105,15 @@
 /* Styles pour la popup welcome/guide */
 
 .welcome-popup {
-    background-color:#f44336;
-    color: white;
-    border: 2px solid #da190b;
-    box-shadow: 0 4px 12px rgba(109, 2, 2, 0.3);
+	background-color: #f44336;
+	color: white;
+	border: 2px solid #da190b;
+	box-shadow: 0 4px 12px rgba(109, 2, 2, 0.3);
 }
 
 .welcome-popup .popup-content p {
-    font-size: 14px;
-    font-weight: bold;
+	font-size: 14px;
+	font-weight: bold;
 }
 
 /* Animation des crédits */
