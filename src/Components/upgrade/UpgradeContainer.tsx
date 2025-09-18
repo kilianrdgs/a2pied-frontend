@@ -7,7 +7,14 @@ import useUpgradeEffect from "./upgrades/useUpgrade.tsx";
 
 export default function UpgradeSystem() {
 
-    const {availablesUpgrades, getAvailablesUpgrades, userUpgrades, getUserUpgrades, buyUpgrade} = useUpgradesStore()
+    const {
+        availablesUpgrades,
+        getAvailablesUpgrades,
+        userUpgrades,
+        getUserUpgrades,
+        buyUpgrade,
+        isBuying
+    } = useUpgradesStore()
     useEffect(() => {
         getAvailablesUpgrades()
         getUserUpgrades()
@@ -110,7 +117,7 @@ export default function UpgradeSystem() {
                             ) : (
                                 <button
                                     onClick={() => buyUpgrade(availableUpgrade)}
-                                    disabled={!canAfford}
+                                    disabled={!canAfford || isBuying}
                                     className={`w-full py-2 px-3 sm:px-4 border-2 font-bold transition-all duration-200 rounded text-xs sm:text-sm ${
                                         canAfford
                                             ? "border-red-500 text-red-500 hover:bg-red-500 hover:text-black hover:scale-105 active:scale-95"

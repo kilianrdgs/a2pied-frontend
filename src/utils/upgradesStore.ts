@@ -32,6 +32,9 @@ export interface UpgradesStoreState {
     updateUpgradeLevel: (id: string, newLevel: number) => Promise<void>;
     createUpgrade: (name: UpgradeName, userEmail: string) => Promise<void>;
 
+    isBuying: boolean;
+    setIsBuying: (value: boolean) => void;
+
     loading: boolean;
     error: string | null;
     reset: () => void;
@@ -42,6 +45,12 @@ export const useUpgradesStore = create<UpgradesStoreState>((set, get) => ({
     loading: false,
     error: null,
     availablesUpgrades: [],
+    isBuying: false,
+    setIsBuying: (value: boolean) => {
+        set(() => ({isBuying: value}))
+    },
+
+
     setAvailablesUpgrades: (availablesUpgrades) => set(() => ({availablesUpgrades})),
 
     setUserUpgrades: (userUpgrades) => set(() => ({userUpgrades})),
@@ -108,6 +117,7 @@ export const useUpgradesStore = create<UpgradesStoreState>((set, get) => ({
         if (!response.ok) set(() => ({error: "erreur lors de l'achat"}))
     }, buyUpgrade: async (availableUpgrade: AvailableUpgrade) => {
         set(() => ({error: ""}));
+        get().setIsBuying(true)
         const {points, removePoints} = usePointsStore.getState();
 
         if (points >= availableUpgrade.nextCost) {
@@ -126,6 +136,7 @@ export const useUpgradesStore = create<UpgradesStoreState>((set, get) => ({
 
                 await get().getUserUpgrades();
                 await get().getAvailablesUpgrades();
+                get().setIsBuying(false)
 
             } catch (error) {
                 set(() => ({error: "Erreur lors de l'achat"}));
