@@ -3,6 +3,7 @@ import {usePointsStore} from "../../../utils/pointsStore.ts";
 import type {MobType} from "../Shop.tsx";
 import useUpgradeEffect from "../../upgrade/upgrades/useUpgrade.tsx";
 import {useLoginFromLocalStorage} from "../../../utils/useLoginFromLocalStorage.tsx";
+import {useState} from "react";
 
 
 export function Invoke5Button({mob, onMobClick}: {
@@ -10,10 +11,14 @@ export function Invoke5Button({mob, onMobClick}: {
     onMobClick: (mobName: string, mobCost: string) => void
 }) {
     const {canBuy5} = useUpgradeEffect()
+    const [disabled, setDisabled] = useState(false)
     const handleClick = () => {
+        setDisabled(true)
         for (let i = 0; i < 5; i++) {
             onMobClick(mob.name, mob.cost)
         }
+        setDisabled(false)
+
     }
     const costX5: number = parseInt(mob.cost) * 5
     const {email} = useLoginFromLocalStorage()
@@ -21,7 +26,7 @@ export function Invoke5Button({mob, onMobClick}: {
     const {points} = usePointsStore();
     if (!canBuy5) return null;
     return <button
-        disabled={!isOpen || points < costX5}
+        disabled={!isOpen || points < costX5 || disabled}
         className={`invoke-button ${
             points >= costX5 ? "affordable" : ""
         }`}

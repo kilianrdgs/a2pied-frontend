@@ -22,15 +22,15 @@ export interface AvailableUpgrade {
 export interface UpgradesStoreState {
     userUpgrades: UserUpgrade[];
     setUserUpgrades: (userUpgrades: UserUpgrade[]) => void;
-    getUserUpgrades: () => void;
+    getUserUpgrades: () => Promise<void>;
 
     availablesUpgrades: AvailableUpgrade[];
     setAvailablesUpgrades: (availableUpgrades: AvailableUpgrade[]) => void;
-    getAvailablesUpgrades: () => void
+    getAvailablesUpgrades: () => Promise<void>
 
-    buyUpgrade: (availableUpgrade: AvailableUpgrade) => void,
-    updateUpgradeLevel: (id: string, newLevel: number) => void;
-    createUpgrade: (name: UpgradeName, userEmail: string) => void;
+    buyUpgrade: (availableUpgrade: AvailableUpgrade) => Promise<void>,
+    updateUpgradeLevel: (id: string, newLevel: number) => Promise<void>;
+    createUpgrade: (name: UpgradeName, userEmail: string) => Promise<void>;
 
     loading: boolean;
     error: string | null;
@@ -106,29 +106,57 @@ export const useUpgradesStore = create<UpgradesStoreState>((set, get) => ({
         });
 
         if (!response.ok) set(() => ({error: "erreur lors de l'achat"}))
-    },
-    buyUpgrade: (availableUpgrade: AvailableUpgrade) => {
-        set(() => ({error: ""}))
-        const updateCurrentUserUprade = () => {
-            const userUpgrade = get().userUpgrades.find((userUpgrade) => userUpgrade.name === availableUpgrade.name)
-            if (userUpgrade) get().updateUpgradeLevel(userUpgrade._id, availableUpgrade.nextLevel)
-        }
-
-        const createUserUpgrade = () => {
-            const email = localStorage.getItem("email") ?? ""
-            get().createUpgrade(availableUpgrade.name, email)
-        }
+    }, buyUpgrade: async (availableUpgrade: AvailableUpgrade) => {
+        set(() => ({error: ""}));
         const {points, removePoints} = usePointsStore.getState();
-        if (points > availableUpgrade.nextCost) {
-            availableUpgrade.nextLevel > 1 ? updateCurrentUserUprade() : createUserUpgrade()
-            if (!get().error) {
 
-                console.log('maj update')
-                removePoints(availableUpgrade.nextCost)
-                get().getUserUpgrades()
-                get().getAvailablesUpgrades()
+        if (points >= availableUpgrade.nextCost) {
+            try {
+                if (availableUpgrade.nextLevel > 1) {
+                    await get().updateUpgradeLevel(
+                        get().userUpgrades.find(u => u.name === availableUpgrade.name)?._id ?? '',
+                        availableUpgrade.nextLevel
+                    );
+                } else {
+                    const email = localStorage.getItem("email") ?? "";
+                    await get().createUpgrade(availableUpgrade.name, email);
+                }
+
+                removePoints(availableUpgrade.nextCost);
+
+                await get().getUserUpgrades();
+                await get().getAvailablesUpgrades();
+
+            } catch (error) {
+                set(() => ({error: "Erreur lors de l'achat"}));
             }
-
+        } else {
+            set(() => ({error: "Fonds insuffisants"}));
         }
     }
+
+    /* buyUpgrade: async (availableUpgrade: AvailableUpgrade) => {
+         set(() => ({error: ""}))
+         const updateCurrentUserUprade = () => {
+             const userUpgrade = get().userUpgrades.find((userUpgrade) => userUpgrade.name === availableUpgrade.name)
+             if (userUpgrade) get().updateUpgradeLevel(userUpgrade._id, availableUpgrade.nextLevel)
+         }
+
+         const createUserUpgrade = () => {
+             const email = localStorage.getItem("email") ?? ""
+             get().createUpgrade(availableUpgrade.name, email)
+         }
+         const {points, removePoints} = usePointsStore.getState();
+         if (points > availableUpgrade.nextCost) {
+             availableUpgrade.nextLevel > 1 ? await updateCurrentUserUprade() : await createUserUpgrade()
+             if (!get().error) {
+
+                 console.log('maj update')
+                 removePoints(availableUpgrade.nextCost)
+                 await get().getUserUpgrades()
+                 get().getAvailablesUpgrades()
+             }
+
+         }
+     }*/
 }));
