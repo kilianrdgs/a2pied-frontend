@@ -28,7 +28,7 @@ export const usePointsStore = create<PointsState>((set, get) => ({
     addPoint: () =>
         set((state) => {
             const newPoints = state.points + 1;
-            if (newPoints % 5 === 0) get().syncToBackend(newPoints);
+            if (newPoints % 10 === 0) get().syncToBackend(newPoints);
 
             return {points: newPoints, error: null};
         }),
@@ -107,7 +107,7 @@ export const usePointsStore = create<PointsState>((set, get) => ({
     addPointWithMultiplier: () => {
         set((state) => {
             const newPoints = state.points + get().multiplier;
-            if (newPoints % 5 === 0) get().syncToBackend(newPoints);
+            if (newPoints % 10 === 0) get().syncToBackend(newPoints);
             return {points: newPoints, error: null};
         })
 
