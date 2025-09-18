@@ -122,6 +122,8 @@ export const useUpgradesStore = create<UpgradesStoreState>((set, get) => ({
         if (points > availableUpgrade.nextCost) {
             availableUpgrade.nextLevel > 1 ? updateCurrentUserUprade() : createUserUpgrade()
             if (!get().error) {
+
+                console.log('maj update')
                 removePoints(availableUpgrade.nextCost)
                 get().getUserUpgrades()
                 get().getAvailablesUpgrades()

@@ -54,7 +54,7 @@ export default function UpgradeSystem() {
             case "BUY_10_IN_A_ROW":
                 return level > 0 ? "ACTIF" : "INACTIF"
             case "CREDIT_MULTIPLIER":
-                return `x${(1 + level * 0.25).toFixed(2)}`
+                return `x${(1 + level).toFixed(2)}`
             default:
                 return ""
         }
