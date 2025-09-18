@@ -14,6 +14,7 @@ type PointsState = {
 
     multiplier: number;
     setMultiplier: (value: number) => void;
+    addPointWithMultiplier: () => void;
 
 };
 
@@ -21,7 +22,7 @@ export const usePointsStore = create<PointsState>((set, get) => ({
     points: 0,
     isLoading: false,
     error: null,
-    multiplier: 0,
+    multiplier: 1,
     setMultiplier: (value: number) => set(() => ({multiplier: value})),
 
     addPoint: () =>
@@ -90,7 +91,6 @@ export const usePointsStore = create<PointsState>((set, get) => ({
             await creditService.saveCredits(points);
             console.log(`Credits saved to backend: ${points}`);
 
-            // Optionnel: retirer l'erreur si la sync réussit
             set({error: null});
         } catch (error) {
             console.error('Failed to save to backend:', error);
@@ -103,4 +103,13 @@ export const usePointsStore = create<PointsState>((set, get) => ({
             });
         }
     },
+
+    addPointWithMultiplier: () => {
+        set((state) => {
+            const newPoints = state.points + get().multiplier;
+            if (newPoints % 5 === 0) get().syncToBackend(newPoints);
+            return {points: newPoints, error: null};
+        })
+
+    }
 }));

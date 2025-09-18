@@ -4,12 +4,12 @@ import logo from "/monster-nobg.png";
 import {usePointsStore} from "../../utils/pointsStore";
 
 export default function Clicker() {
-    const addPoint = usePointsStore((state) => state.addPoint);
+    const addPointWithMultiplier = usePointsStore((state) => state.addPointWithMultiplier);
 
     const [isPulsing, setIsPulsing] = useState(false);
 
     const handleClick = () => {
-        addPoint();
+        addPointWithMultiplier();
         setIsPulsing(true);
         setTimeout(() => setIsPulsing(false), 200);
     };

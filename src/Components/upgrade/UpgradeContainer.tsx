@@ -33,7 +33,7 @@ export default function UpgradeSystem() {
     const getUpgradeName = (upgradeKey: string): string => {
         switch (upgradeKey) {
             case "AUTO_CREDIT":
-                return "AUTO-CRÉDIT"
+                return "Générateur de crédit"
             case "BUY_5_IN_A_ROW":
                 return "ACHAT x5"
             case "BUY_10_IN_A_ROW":
@@ -48,7 +48,7 @@ export default function UpgradeSystem() {
     const getUpgradeEffect = (upgradeKey: string, level: number): string => {
         switch (upgradeKey) {
             case "AUTO_CREDIT":
-                return `+${level * 2}/sec`
+                return `+1/${6 - level}sec`
             case "BUY_5_IN_A_ROW":
                 return level > 0 ? "ACTIF" : "INACTIF"
             case "BUY_10_IN_A_ROW":
@@ -90,7 +90,7 @@ export default function UpgradeSystem() {
                                 <div className="flex items-center gap-2 sm:gap-3">
                                     <span className="text-xl sm:text-2xl">{getUpgradeIcon(availableUpgrade.name)}</span>
                                     <div>
-                                        <h3 className="text-sm sm:text-lg font-bold">{availableUpgrade.name}</h3>
+                                        <h3 className="text-sm sm:text-lg font-bold">{getUpgradeName(availableUpgrade.name)}</h3>
                                         <p className="text-xs text-red-300">{availableUpgrade.description}</p>
                                     </div>
                                 </div>
@@ -155,7 +155,7 @@ export default function UpgradeSystem() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                     {userUpgrades
                         .map((userUpgrade) => (
-                            <div key={`Available-${userUpgrade.name}`}
+                            <div key={`User-${userUpgrade.name}`}
                                  className="bg-red-900/20 border border-red-500/50 p-2 rounded text-center">
                                 <div className="text-base sm:text-lg">{getUpgradeIcon(userUpgrade.name)}</div>
                                 <div className="text-xs font-bold">{getUpgradeName(userUpgrade.name)}</div>

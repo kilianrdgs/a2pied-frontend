@@ -13,15 +13,11 @@ function useUpgradeEffect() {
         const level = userUpgrades.find(upg => upg.name === 'AUTO_CREDIT')?.level ?? 0;
 
         useEffect(() => {
-            //todo : mettre ça a jour
             if (level <= 0) return;
-
-            const creditsPerMinute = 10 * level;
-            const creditsPerSecond = creditsPerMinute / 60;
 
             const interval = setInterval(() => {
                 addPoint();
-            }, 1000);
+            }, (6 - level) * 1000);
 
             return () => clearInterval(interval);
         }, [level, addPoint]);
@@ -31,11 +27,9 @@ function useUpgradeEffect() {
     const checkIfMultiplier = () => {
         const level = userUpgrades.find(upg => upg.name === 'CREDIT_MULTIPLIER')?.level ?? 0;
 
-
         useEffect(() => {
             if (level <= 0) return;
-            setMultiplier(multiplier + (level / 3))
-
+            setMultiplier(multiplier + level)
         }, [level]);
     }
 

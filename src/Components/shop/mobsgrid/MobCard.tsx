@@ -3,6 +3,7 @@ import {useLoginFromLocalStorage} from "../../../utils/useLoginFromLocalStorage.
 import {useAppWebSocket} from "../../../utils/useAppWebSocket.ts";
 import {usePointsStore} from "../../../utils/pointsStore.ts";
 import {useState} from "react";
+import {Invoke5Button} from "./Invoke5Button.tsx";
 
 type Props = {
     mob: MobType, onMobClick: (mobName: string, mobCost: string) => void;
@@ -44,14 +45,16 @@ export function MobCard({mob, onMobClick}: Props) {
             </div>
             <span className="text-gray-300 text-xs leading-relaxed tracking-wide text-left">{mob.description}</span>
         </div>
-        <button
-            disabled={!isOpen || points < parseInt(mob.cost, 10)}
-            className={`invoke-button ${
-                points >= parseInt(mob.cost, 10) ? "affordable" : ""
-            }`}
-            onClick={() => onMobClick(mob.name, mob.cost)}
-        >
-            {points < parseInt(mob.cost, 10) ? "Insuffisant" : "Invoquer"}
-        </button>
+        <div className="flex  gap-2 w-full">
+            <button
+                disabled={!isOpen || points < parseInt(mob.cost, 10)}
+                className={`invoke-button ${
+                    points >= parseInt(mob.cost, 10) ? "affordable" : ""
+                }`}
+                onClick={() => onMobClick(mob.name, mob.cost)}
+            >
+                {points < parseInt(mob.cost, 10) ? "Insuffisant" : "Invoquer"}
+            </button>
+            <Invoke5Button mob={mob} onMobClick={onMobClick}/></div>
     </div>;
 }
