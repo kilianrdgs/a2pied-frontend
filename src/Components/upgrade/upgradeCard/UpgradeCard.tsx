@@ -1,15 +1,12 @@
 import "./upgradeCard.css";
-import { useUpgradesStore } from "../../../utils/upgradesStore";
+
 import { getUpgradeEffect, getUpgradeName } from "../upgradeHelpers";
+import {
+  useUpgradesStore,
+  type AvailableUpgrade,
+} from "../../../utils/upgradesStore";
 
 ("../../../utils/upgradesStore.ts");
-
-export type AvailableUpgrade = {
-  name: string;
-  description: string;
-  nextCost: number;
-  maxLevel: number;
-};
 
 type UpgradeCardProps = {
   available: AvailableUpgrade;
@@ -80,7 +77,7 @@ export default function UpgradeCard({
           </div>
         ) : (
           <button
-            onClick={() => buyUpgrade}
+            onClick={() => buyUpgrade(available)}
             disabled={!canAfford || isBuying}
             className={`w-full py-2 px-3 sm:px-4 border-2 font-bold transition-all duration-200 rounded text-xs sm:text-sm ${
               canAfford
