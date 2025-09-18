@@ -11,12 +11,18 @@ type PointsState = {
     setPoints: (value: number) => void;
     loadCreditsFromBackend: () => Promise<void>;
     syncToBackend: (points: number) => Promise<void>;
+
+    multiplier: number;
+    setMultiplier: (value: number) => void;
+
 };
 
 export const usePointsStore = create<PointsState>((set, get) => ({
     points: 0,
     isLoading: false,
     error: null,
+    multiplier: 0,
+    setMultiplier: (value: number) => set(() => ({multiplier: value})),
 
     addPoint: () =>
         set((state) => {
